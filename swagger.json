@@ -1,0 +1,2106 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "UFW Manger API",
+    "description": "This is a set of APIs you can use for managing the UFW service.",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Everything about user authorization"
+    },
+    {
+      "name": "Users",
+      "description": "Everything about your users"
+    },
+    {
+      "name": "UFW Manager",
+      "description": "Everything about managing UFW"
+    }
+  ],
+  "paths": {
+    "/signup": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Create new user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/auth_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n    \"username\":\"test\",\n    \"password\":\"Test1!\"\n}"
+                },
+                "1": {
+                  "value": "{\n    \"username\":\"test\",\n    \"password\":\"Test123!\"\n}"
+                },
+                "2": {
+                  "value": "{\n    \"username\":\"test\",\n    \"password\":\"Test123!\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Signed up successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_routes_response"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\n  \"message\": \"your username registered, contact your system administrator to get your access\"\n}\n"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_routes_response"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"message\":\"The password needs to be more than 8 char and must include upper case, lower case, digits and symbols like Test123!\"}\n"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The user already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_routes_response"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"message\":\"This username isn't available.\"}\n"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/signin": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "You need to sign in to get api token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/auth_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n    \n}"
+                },
+                "1": {
+                  "value": "{\n    \"username\":\"test\",\n    \"password\":\"Test12!\"\n}"
+                },
+                "2": {
+                  "value": "{\n    \"username\":\"test\",\n    \"password\":\"Test123!\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "api token and sign in message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/signin_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"access_token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTYxOTM0NDcyMywianRpIjoiOWZlOWNkZDktNjE2MS00NDRjLTllNzEtYTExYjMxYzhmODY4IiwibmJmIjoxNjE5MzQ0NzIzLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoidGVzdCIsImV4cCI6MTc0Mzc2MDcyM30.7OjacjsL5RsfcIx46tmk-Xymc9n75ny8co8Z-ZMPf7M\",\"message\":\"Login succeeded.\"}\n"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Wrong username or password!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_routes_response"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"message\":\"Wrong username or password!\"}\n"
+                  },
+                  "1": {
+                    "value": "{\"message\":\"Wrong username or password!\"}\n"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change_password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Change password of the signed-in user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/change_password_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n    \"current_password\":\"Test1234!\",\n    \"new_password\":\"Test123!\",\n    \"confirm_new_password\":\"Test123!\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The user's password changed to the new password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_routes_response"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"message\":\"Your password changed successfully.\"}\n"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_routes_response"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"message\":\"Unauthorized user\"}\n"
+                  },
+                  "1": {
+                    "value": "{\"message\":\"Unauthorized user\"}\n"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager",
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/grant_authorization": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Admin can grant authorization for users",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/grant_authorization_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n    \"username\":\"test\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorization granted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/grant_authorization_response"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"message\":[\"test authorized with manager privileges\",\"date: 2021-04-25 14:59:49\"]}\n"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorization granted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/grant_authorization_response"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"message\":[\"user 'test1' does not exist\",\"date: 2021-04-25 14:59:49\"]}\n"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_routes_response"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"message\":\"Unauthorized user\"}\n"
+                  },
+                  "1": {
+                    "value": "{\"message\":\"Unauthorized user\"}\n"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_user_privileges": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "To get user privileges",
+        "responses": {
+          "200": {
+            "description": "Response with user privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_user_privileges_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\": { \"isAdmin\": true,\"isManager\": true}, \"date\": \"2021-05-13 22:16:14\"}"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\": \"Unauthorized user\", \"date\": \"2021-05-13 22:16:14\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager",
+              "user"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "Admin can get users by id or part of the username",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "ID that needs to considered for filter",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "description": "Username that needs to considered for filter",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users with ID or username as the one you send",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_users_list_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"result\": [{\"admin_privileges\": false,\"id\": 2,\"manager_privileges\": true,\"username\": \"test\"},{\"admin_privileges\": false,\"id\": 3, \"manager_privileges\": false,\"username\": \"test1\"}],\"total\": 2,\"date\": \"2021-05-13 22:32:18\" }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No user found with this ID or username",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_users_list_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"result\": [],\"total\": 0,\"date\": \"2021-05-13 22:32:18\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\",\"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_all_user": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "Admin can get all users",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_users_list_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"result\": [{\"admin_privileges\": true,\"id\": 1,\"manager_privileges\": true,\"username\": \"admin\"},{\"admin_privileges\": false,\"id\": 2, \"manager_privileges\": true,\"username\": \"test\"}],\"total\": 2,\"date\": \"2021-05-13 22:32:18\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\",\"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/add_rule": {
+      "post": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can add a new rule to UFW service or update one",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Rule"
+              },
+              "examples": {
+                "0": {
+                  "value": "{ \"rule_action\": \"deny\", \"in_out\": \"out\", \"from_IP\": \"2001:db8::/32\", \"from_service_name\": \"http\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"protocol\": \"tcp\", \"comment\": \"test\" }"
+                },
+                "1": {
+                  "value": "{ \"rule_action\": \"deny\", \"in_out\": \"out\", \"from_IP\": \"2001:db8::/32\", \"from_service_name\": \"http\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"protocol\": \"tcp\", \"comment\": \"test1\" }"
+                },
+                "2": {
+                  "value": "{ \"rule_action\": \"deny\", \"protocol\": \"tcp\" }"
+                },
+                "3": {
+                  "value": "{ \"rule_action\": \"deny\", \"from_IP\": \"10.0.0.0/5\", \"to_IP\": \"192.168.0.2\" }"
+                },
+                "4": {
+                  "value": "{ \"rule_action\": \"deny\", \"from_IP\": \"10.0.0.0/5\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\" }"
+                },
+                "5": {
+                  "value": "{\n    \n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The rule added or updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule added\nRule added (v6)\n\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule updated (v6)\n\" }"
+                  },
+                  "2": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule added\n\" }"
+                  },
+                  "3": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule updated\" }"
+                  },
+                  "4": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Skipping adding existing rule (v6)\n\" }"
+                  },
+                  "5": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Skipping adding existing rule\n\" }"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The rule not added/updated because of bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad request.\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad requst something like -> Mixed IP versions for 'from' and 'to'\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\",\"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/delete_rule": {
+      "post": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can delete rules from UFW service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Rule"
+              },
+              "examples": {
+                "0": {
+                  "value": "{ \"rule_type_delete\": \"deny\", \"in_out\": \"out\", \"from_IP\": \"2001:db8::/32\", \"from_service_name\": \"http\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"protocol\": \"tcp\", \"comment\": \"test\" }"
+                },
+                "1": {
+                  "value": "{ \"rule_type_delete\": \"deny\", \"in_out\": \"out\", \"from_IP\": \"2001:db8::/32\", \"from_service_name\": \"http\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"protocol\": \"tcp\", \"comment\": \"test1\" }"
+                },
+                "2": {
+                  "value": "{ \"rule_type_delete\": \"deny\", \"from_IP\": \"10.0.0.0/5\", \"to_IP\": \"192.168.0.2\" }"
+                },
+                "3": {
+                  "value": "{ \"rule_type_delete\": \"deny\", \"protocol\": \"tcp\" }"
+                },
+                "4": {
+                  "value": "{ \"rule_type_delete\": \"deny\", \"from_IP\": \"10.0.0.0/5\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\" }"
+                },
+                "5": {
+                  "value": "{\n    \n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The rule deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted\nRule deleted (v6)\n\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted (v6)\n\n\" }"
+                  },
+                  "2": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted\n\" }"
+                  },
+                  "3": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Could not delete non-existent rule\n\" }"
+                  },
+                  "4": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Could not delete non-existent rule (v6)\n\" }"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The rule not deleted because of bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad request.\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad requst something like -> Mixed IP versions for 'from' and 'to'\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\",\"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/delete_rule_by_id": {
+      "post": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can delete rules from UFW service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rule_id": {
+                    "type": "integer",
+                    "required": true
+                  }
+                }
+              },
+              "examples": {
+                "0": {
+                  "value": "{ \"rule_id\": \"1\" }"
+                },
+                "1": {
+                  "value": "{ \"rule_id\": \"1000\" }"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The rule deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted\nRule deleted (v6)\n\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted (v6)\n\n\" }"
+                  },
+                  "2": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted\n\" }"
+                  },
+                  "3": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Could not delete non-existent rule\n\" }"
+                  },
+                  "4": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Could not delete non-existent rule (v6)\n\" }"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The rule not deleted because of bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad request.\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad requst something like -> Mixed IP versions for 'from' and 'to'\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\",\"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_services": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get all the service names on the system that are listed on /etc/services",
+        "responses": {
+          "200": {
+            "description": "List of all the service names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_services_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"result\": [{ \"name\": \"tcpmux\" } , { \"name\": \"echo\" } , { \"name\": \"discard\" }], \"date\": \"2021-05-14 15:44:51\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_status_change_records_by_time": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "Admin can get the records of changing status of UFW by time",
+        "parameters": [
+          {
+            "name": "from_date",
+            "in": "query",
+            "description": "The date that needs to considered for filter records from that date",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "to_date",
+            "in": "query",
+            "description": "The date that need to considered for filter records to that date",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of changing status of UFW",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_status_change_record_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 17:43:52\", \"result\": [{ \"change_date\": \"2021-05-05T14:28:47.334958\", \"id\": 1, \"ufw_status\": false, \"user_id\": 2 } , { \"change_date\": \"2021-05-05T14:28:47.334958\", \"id\": 2, \"ufw_status\": true, \"user_id\": 3 }] , \"total\": 2 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No UFW status change records found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"No status change found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_status_change_records_by_user_id": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "Admin can get records of changing status of UFW by changer user ID",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "The user ID that needs to considered for filter",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of changing status of UFW",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_status_change_record_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 17:43:52\", \"result\": [{ \"change_date\": \"2021-05-05T14:28:47.334958\", \"id\": 1, \"ufw_status\": false, \"user_id\": 2 } , { \"change_date\": \"2021-05-05T14:28:47.334958\", \"id\": 2, \"ufw_status\": true, \"user_id\": 2 }] , \"total\": 2 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No UFW status change records found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"no status change found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_all_rules": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get all UFW rules",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of all UFW rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_rules_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": [{ \"add_date\": \"2021-05-14T18:23:07.710751\", \"comment\": \"test\", \"from_IP\": \"2001:db8::/32\", \"from_port\": \"80\", \"from_service_name\": \"http\", \"id\": 1, \"in_out\": \"out\", \"protocol\": \"tcp\", \"rule_action\": \"deny\", \"rule_command\": \"deny out from 2001:db8::/32 port 80 to 2002:4559:1FE2::4559:1FE2 port 30 proto tcp comment test\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"to_service_name\": null, \"user_id\": 1}], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "no UFW rule found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"no rule found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_rules_by_user_id": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "you can get UFW rule with adder user id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "user id that need to considered for filter",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of UFW rules ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_rules_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": [{ \"add_date\": \"2021-05-14T18:23:07.710751\", \"comment\": \"test\", \"from_IP\": \"2001:db8::/32\", \"from_port\": \"80\", \"from_service_name\": \"http\", \"id\": 1, \"in_out\": \"out\", \"protocol\": \"tcp\", \"rule_action\": \"deny\", \"rule_command\": \"deny out from 2001:db8::/32 port 80 to 2002:4559:1FE2::4559:1FE2 port 30 proto tcp comment test\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"to_service_name\": null, \"user_id\": 1}], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "no UFW rule found with this adder user id ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"no rule found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_rules_by_type": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get UFW rules with rule action type",
+        "parameters": [
+          {
+            "name": "ruleAction",
+            "in": "query",
+            "description": "The rule action type needs to considered for filter</br> It must be one of the items in this list [allow, deny, reject, limit]",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of UFW rules ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_rules_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": [{ \"add_date\": \"2021-05-14T18:23:07.710751\", \"comment\": \"test\", \"from_IP\": \"2001:db8::/32\", \"from_port\": \"80\", \"from_service_name\": \"http\", \"id\": 1, \"in_out\": \"out\", \"protocol\": \"tcp\", \"rule_action\": \"deny\", \"rule_command\": \"deny out from 2001:db8::/32 port 80 to 2002:4559:1FE2::4559:1FE2 port 30 proto tcp comment test\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"to_service_name\": null, \"user_id\": 1}], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No UFW rule found with this rule action type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"no rule found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_all_deleted_rules": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get all deleted UFW rule records",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all deleted UFW rule records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedRule"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:44:42\", \"result\": [{ \"add_date\": \"2021-05-05T12:25:25.659918\", \"adder_user_id\": 1, \"delete_date\": \"2021-05-05T12:26:47.934216\", \"deleter_user_id\": 2, \"id\": 5, \"rule_command\": \"deny out from 192.168.0.1/5 port 25 to 10.0.0.0/6 port 25 proto tcp comment test\" }], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No UFW deleted rule found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"No deleted rule found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_deleted_rules_by_user_id": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get deleted UFW rule records by adder or/and deleter user ID",
+        "parameters": [
+          {
+            "name": "deleterUserId",
+            "in": "query",
+            "description": "The user ID that deleted UFW rules needs to considered for filter",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "adderUserId",
+            "in": "query",
+            "description": "The user ID that adds these deleted UFW rules need to considered for filter",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all deleted UFW rule records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedRule"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:44:42\", \"result\": [{ \"add_date\": \"2021-05-05T12:25:25.659918\", \"adder_user_id\": 1, \"delete_date\": \"2021-05-05T12:26:47.934216\", \"deleter_user_id\": 2, \"id\": 5, \"rule_command\": \"deny out from 192.168.0.1/5 port 25 to 10.0.0.0/6 port 25 proto tcp comment test\" }], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No UFW deleted rule found with these IDs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"No deleted rule with these ids found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_deleted_rules_by_type": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get deleted UFW rule records by rule action type",
+        "parameters": [
+          {
+            "name": "ruleAction",
+            "in": "query",
+            "description": "The rule action type needs to considered for filter</br> it must be one of the items in this list [allow, deny, reject, limit]",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all deleted UFW rule records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedRule"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:44:42\", \"result\": [{ \"add_date\": \"2021-05-05T12:25:25.659918\", \"adder_user_id\": 1, \"delete_date\": \"2021-05-05T12:26:47.934216\", \"deleter_user_id\": 2, \"id\": 5, \"rule_command\": \"deny out from 192.168.0.1/5 port 25 to 10.0.0.0/6 port 25 proto tcp comment test\" }], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No UFW deleted rule found with this rule action type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"No rule with this type found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/status": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get UFW service status",
+        "responses": {
+          "200": {
+            "description": "The UFW service status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_status_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:09:29\", \"result\": [ \"Status: active\", \"Anywhere DENY 80/tcp\", \"Anywhere (v6) DENY 80/tcp (v6)\"]}"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/enable": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can enable UFW service",
+        "responses": {
+          "200": {
+            "description": "UFW service enabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:12:40\", \"result\": \"Firewall is active and enabled on system startup\n\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:12:40\", \"result\": \"Firewall is already enabled\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/disable": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can disable UFW service",
+        "responses": {
+          "200": {
+            "description": "UFW service disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:12:40\", \"result\": \"Firewall stopped and disabled on system startup\n\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:12:40\", \"result\": \"Firewall is already disabled\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/reload": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can reload UFW service",
+        "responses": {
+          "200": {
+            "description": "UFW service reloaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:25:00\", \"result\": \"Firewall reloaded\n\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:25:00\", \"result\": \"Firewall not enabled (skipping reload)\n\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "admin_privileges": {
+            "type": "boolean"
+          },
+          "manager_privileges": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Service": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Status": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "change_date": {
+            "type": "string"
+          },
+          "ufw_status": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DeletedRule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "adder_user_id": {
+            "type": "integer"
+          },
+          "add_date": {
+            "type": "string"
+          },
+          "deleter_user_id": {
+            "type": "integer"
+          },
+          "delete_date": {
+            "type": "string"
+          },
+          "rule_command": {
+            "type": "string"
+          }
+        }
+      },
+      "Rule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "rule_command": {
+            "type": "string"
+          },
+          "rule_action": {
+            "type": "string"
+          },
+          "in_out": {
+            "type": "string"
+          },
+          "from_IP": {
+            "type": "string"
+          },
+          "from_port": {
+            "type": "string"
+          },
+          "from_service_name": {
+            "type": "string"
+          },
+          "to_IP": {
+            "type": "string"
+          },
+          "to_port": {
+            "type": "string"
+          },
+          "to_service_name": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "add_date": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          }
+        }
+      },
+      "auth_body": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "grant_authorization_body": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "change_password_body": {
+        "type": "object",
+        "properties": {
+          "confirm_new_password": {
+            "type": "string"
+          },
+          "new_password": {
+            "type": "string"
+          },
+          "current_password": {
+            "type": "string"
+          }
+        }
+      },
+      "signin_response_200": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "user_routes_response": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "grant_authorization_response": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "get_users_list_response_200": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      },
+      "get_user_privileges_200": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "isAdmin": {
+                "type": "boolean"
+              },
+              "isManager": {
+                "type": "boolean"
+              }
+            }
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      },
+      "unauthorized_user_403": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      },
+      "list_unauthorized_user_403": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      },
+      "get_services_200": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Service"
+            }
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      },
+      "get_status_change_record_200": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Status"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      },
+      "get_rules_200": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rule"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      },
+      "get_status_200": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      },
+      "ufw_response_200": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "token": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

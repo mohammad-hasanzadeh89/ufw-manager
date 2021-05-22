@@ -1,0 +1,31 @@
+.App {
+    margin: 1rem;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #222;
+}
+
+.fullwidth {
+    width: 100%;
+    margin: 1rem;
+    justify-content: space-evenly;
+}
+
+.buttons-box-wrapper > Button { 
+    margin: 1rem;
+}
+
+
+.center-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+  }
+
+.spinner {
+    min-width: 25vh;
+    min-height: 25vh;
+}
+
