@@ -48,7 +48,7 @@ class RuleSchema(ma.Schema):
     """
     class Meta:
         fields = ("id", "user_id", "rule_command", "rule_action",
-                  "in_out", "to_IP", "to_port", "to_port", "to_service_name",
+                  "in_out", "to_IP", "to_port", "to_service_name",
                   "from_IP", "from_port", "from_service_name",
                   "protocol", "comment", "add_date")
 

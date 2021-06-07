@@ -28,7 +28,8 @@ class UFWManager extends Component {
             isEnable: false,
             status: { result: [], date: "" },
             isCheckingStatus: false,
-            showConfirmation: false
+            showConfirmation: false,
+            warning: false
         }
     };
     statusWithDetail = () => {
@@ -47,6 +48,11 @@ class UFWManager extends Component {
     showConfirmMessage = (nextAction) => {
         this.message =
             `Are you sure you want to ${nextAction} UFW service?`;
+        if (nextAction == "reset") {
+            this.setState({ warning: true })
+        } else {
+            this.setState({ warning: false })
+        }
         this.nextAction = nextAction;
         this.setState({ showConfirmation: true })
     }
@@ -238,6 +244,15 @@ class UFWManager extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <p>{this.message}</p>
+                        {this.state.warning &&
+                            <b style={{
+                                color: "red"
+                            }}>
+                                Warning: use this with extra caution.
+                                because all rules/routes will be deleted,
+                                and UFW service will be disabled
+                            </b>
+                        }
                     </Modal.Body>
                     <Modal.Footer>
                         <Button

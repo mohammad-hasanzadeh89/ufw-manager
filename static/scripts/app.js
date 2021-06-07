@@ -11,6 +11,8 @@ import UsersList from './users-list';
 import ChangePassword from './change-password';
 import RuleList from './rule-list';
 import DeletedRuleList from './deleted-rule-list';
+import RouteList from './route-list';
+import DeletedRouteList from './deleted-route-list';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import StatusList from './status-list';
 
@@ -109,10 +111,23 @@ class App extends Component {
                                 </Nav.Link>
                             }
                             {
+                                this.state.isManager &&
+                                <Nav.Link href="#routes">
+                                    Routes
+                                </Nav.Link>
+                            }
+                            {
                                 this.state.isAdmin &&
 
                                 <Nav.Link href="#deletedRules">
                                     Deleted Rules
+                                </Nav.Link>
+                            }
+                            {
+                                this.state.isAdmin &&
+
+                                <Nav.Link href="#deletedRoutes">
+                                    Deleted Routes
                                 </Nav.Link>
                             }
                             {
@@ -173,8 +188,24 @@ class App extends Component {
                         </Route>
                     </Switch>
                     <Switch>
+                        <Route path="/routes">
+                            <RouteList
+                                token={token}
+                                isAdmin={this.state.isAdmin}
+                                isManager={this.state.isManager} />
+                        </Route>
+                    </Switch>
+                    <Switch>
                         <Route path="/deletedRules">
                             <DeletedRuleList
+                                token={token}
+                                isAdmin={this.state.isAdmin}
+                                isManager={this.state.isManager} />
+                        </Route>
+                    </Switch>
+                    <Switch>
+                        <Route path="/deletedRoutes">
+                            <DeletedRouteList
                                 token={token}
                                 isAdmin={this.state.isAdmin}
                                 isManager={this.state.isManager} />

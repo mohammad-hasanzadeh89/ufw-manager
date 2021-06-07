@@ -745,7 +745,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "rule_id": {
+                  "ruleId": {
                     "type": "integer",
                     "required": true
                   }
@@ -753,10 +753,328 @@
               },
               "examples": {
                 "0": {
-                  "value": "{ \"rule_id\": \"1\" }"
+                  "value": "{ \"ruleId\": \"1\" }"
                 },
                 "1": {
-                  "value": "{ \"rule_id\": \"1000\" }"
+                  "value": "{ \"ruleId\": \"1000\" }"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The rule deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted\nRule deleted (v6)\n\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted (v6)\n\n\" }"
+                  },
+                  "2": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted\n\" }"
+                  },
+                  "3": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Could not delete non-existent rule\n\" }"
+                  },
+                  "4": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Could not delete non-existent rule (v6)\n\" }"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The rule not deleted because of bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad request.\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad requst something like -> Mixed IP versions for 'from' and 'to'\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\",\"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/add_route": {
+      "post": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can add a new routing rule to UFW service or update one",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Route"
+              },
+              "examples": {
+                "0": {
+                  "value": "{ \"route_action\": \"deny\", \"_in\": \"in\", \"in_on\": \"eth0\",\"_out\": \"out\", \"out_on\": \"wlan0\", \"from_IP\": \"2001:db8::/32\", \"from_service_name\": \"http\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"protocol\": \"tcp\", \"comment\": \"test\" }"
+                },
+                "1": {
+                  "value": "{ \"route_action\": \"deny\", \"_in\": \"in\", \"in_on\": \"eth0\", \"from_IP\": \"2001:db8::/32\", \"from_service_name\": \"http\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"protocol\": \"tcp\", \"comment\": \"test1\" }"
+                },
+                "2": {
+                  "value": "{ \"route_action\": \"deny\", \"protocol\": \"tcp\" }"
+                },
+                "3": {
+                  "value": "{ \"route_action\": \"deny\", \"from_IP\": \"10.0.0.0/5\", \"to_IP\": \"192.168.0.2\" }"
+                },
+                "4": {
+                  "value": "{ \"route_action\": \"deny\", \"from_IP\": \"10.0.0.0/5\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\" }"
+                },
+                "5": {
+                  "value": "{\n    \n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The rule added or updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule added\nRule added (v6)\n\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule updated (v6)\n\" }"
+                  },
+                  "2": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule added\n\" }"
+                  },
+                  "3": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule updated\" }"
+                  },
+                  "4": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Skipping adding existing rule (v6)\n\" }"
+                  },
+                  "5": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Skipping adding existing rule\n\" }"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The rule not added/updated because of bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad request.\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad requst something like -> Mixed IP versions for 'from' and 'to'\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\",\"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/delete_route": {
+      "post": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can delete routing rules from UFW service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Route"
+              },
+              "examples": {
+                "0": {
+                  "value": "{ \"route_type_delete\": \"deny\", \"_in\": \"in\", \"in_on\": \"eth0\",\"_out\": \"out\", \"out_on\": \"wlan0\", \"from_IP\": \"2001:db8::/32\", \"from_service_name\": \"http\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"protocol\": \"tcp\", \"comment\": \"test\" }"
+                },
+                "1": {
+                  "value": "{ \"route_type_delete\": \"deny\", \"_in\": \"in\", \"in_on\": \"eth0\",\"_out\": \"out\", \"out_on\": \"wlan0\", \"from_IP\": \"2001:db8::/32\", \"from_service_name\": \"http\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"protocol\": \"tcp\", \"comment\": \"test1\" }"
+                },
+                "2": {
+                  "value": "{ \"route_type_delete\": \"deny\", \"from_IP\": \"10.0.0.0/5\", \"to_IP\": \"192.168.0.2\" }"
+                },
+                "3": {
+                  "value": "{ \"route_type_delete\": \"deny\", \"protocol\": \"tcp\" }"
+                },
+                "4": {
+                  "value": "{ \"route_type_delete\": \"deny\", \"from_IP\": \"10.0.0.0/5\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\" }"
+                },
+                "5": {
+                  "value": "{\n    \n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The rule deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted\nRule deleted (v6)\n\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted (v6)\n\n\" }"
+                  },
+                  "2": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Rule deleted\n\" }"
+                  },
+                  "3": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Could not delete non-existent rule\n\" }"
+                  },
+                  "4": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:28\", \"result\": \"Could not delete non-existent rule (v6)\n\" }"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The rule not deleted because of bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad request.\" }"
+                  },
+                  "1": {
+                    "value": "{ \"date\": \"2021-05-14 20:53:06\", \"result\": \"Bad requst something like -> Mixed IP versions for 'from' and 'to'\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\",\"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/delete_route_by_id": {
+      "post": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can delete routing rules from UFW service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "route_id": {
+                    "type": "integer",
+                    "required": true
+                  }
+                }
+              },
+              "examples": {
+                "0": {
+                  "value": "{ \"routeId\": \"1\" }"
+                },
+                "1": {
+                  "value": "{ \"routeId\": \"1000\" }"
                 }
               }
             }
@@ -1244,7 +1562,7 @@
             "in": "query",
             "description": "The rule action type needs to considered for filter</br> It must be one of the items in this list [allow, deny, reject, limit]",
             "required": false,
-            "type": "integer"
+            "type": "string"
           },
           {
             "name": "page",
@@ -1581,6 +1899,524 @@
         ]
       }
     },
+    "/get_all_routes": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get all UFW routing rules",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of all UFW routing rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_routes_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": [{ \"add_date\": \"2021-05-14T18:23:07.710751\", \"comment\": \"test2\", \"from_IP\": \"2001:db8::/32\", \"from_port\": \"80\", \"from_service_name\": \"http\", \"id\": 1, \"_in\": \"in\", \"_out\": \"out\", \"in_on\": \"eth0\", \"out_on\": \"wlan0\", \"protocol\": \"tcp\", \"route_action\": \"deny\", \"route_command\": \"route_command\": \"route deny in on eth0 out on wlan0 from 2001:db8::/32 port 80 to 2002:4559:1FE2::4559:1FE2 port 30 proto tcp comment test2\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"to_service_name\": null, \"user_id\": 1}], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "no UFW routing rule found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"no rule found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_routes_by_user_id": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "you can get UFW routing rule with adder user id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "user id that need to considered for filter",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of all UFW routing rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_routes_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": [{ \"add_date\": \"2021-05-14T18:23:07.710751\", \"comment\": \"test2\", \"from_IP\": \"2001:db8::/32\", \"from_port\": \"80\", \"from_service_name\": \"http\", \"id\": 1, \"_in\": \"in\", \"_out\": \"out\", \"in_on\": \"eth0\", \"out_on\": \"wlan0\", \"protocol\": \"tcp\", \"route_action\": \"deny\", \"route_command\": \"route_command\": \"route deny in on eth0 out on wlan0 from 2001:db8::/32 port 80 to 2002:4559:1FE2::4559:1FE2 port 30 proto tcp comment test2\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"to_service_name\": null, \"user_id\": 1}], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "no UFW rule found with this adder user id ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"no rule found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_routes_by_type": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get UFW routing rules with rule action type",
+        "parameters": [
+          {
+            "name": "routeAction",
+            "in": "query",
+            "description": "The routing rule action type needs to considered for filter</br> It must be one of the items in this list [allow, deny, reject, limit]",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of all UFW routing rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_routes_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": [{ \"add_date\": \"2021-05-14T18:23:07.710751\", \"comment\": \"test2\", \"from_IP\": \"2001:db8::/32\", \"from_port\": \"80\", \"from_service_name\": \"http\", \"id\": 1, \"_in\": \"in\", \"_out\": \"out\", \"in_on\": \"eth0\", \"out_on\": \"wlan0\", \"protocol\": \"tcp\", \"route_action\": \"deny\", \"route_command\": \"route_command\": \"route deny in on eth0 out on wlan0 from 2001:db8::/32 port 80 to 2002:4559:1FE2::4559:1FE2 port 30 proto tcp comment test2\", \"to_IP\": \"2002:4559:1FE2::4559:1FE2\", \"to_port\": \"30\", \"to_service_name\": null, \"user_id\": 1}], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No UFW rule found with this rule action type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"no rule found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_all_deleted_routes": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get all deleted UFW routing rule records",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all deleted UFW routing rule records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedRoute"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:44:42\", \"result\": [{ \"add_date\": \"2021-05-05T12:25:25.659918\", \"adder_user_id\": 1, \"delete_date\": \"2021-05-05T12:26:47.934216\", \"deleter_user_id\": 2, \"id\": 5, \"route_command\": \"route deny in on eth0 out on wlan0 from 2001:db8::/32 port 80 to 2002:4559:1FE2::4559:1FE2 port 30 proto tcp comment test2\" }], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No UFW deleted rule found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"No deleted rule found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_deleted_routes_by_user_id": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get deleted UFW routing rule records by adder or/and deleter user ID",
+        "parameters": [
+          {
+            "name": "deleterUserId",
+            "in": "query",
+            "description": "The user ID that deleted UFW routing rules needs to considered for filter",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "adderUserId",
+            "in": "query",
+            "description": "The user ID that adds these deleted UFW routing rules need to considered for filter",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all deleted UFW routing rule records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedRoute"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:44:42\", \"result\": [{ \"add_date\": \"2021-05-05T12:25:25.659918\", \"adder_user_id\": 1, \"delete_date\": \"2021-05-05T12:26:47.934216\", \"deleter_user_id\": 2, \"id\": 5, \"route_command\": \"route deny in on eth0 out on wlan0 from 2001:db8::/32 port 80 to 2002:4559:1FE2::4559:1FE2 port 30 proto tcp comment test2\" }], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No UFW deleted rule found with these IDs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"No deleted rule with these ids found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/get_deleted_routes_by_type": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can get deleted UFW routing rule records by rule action type",
+        "parameters": [
+          {
+            "name": "routeAction",
+            "in": "query",
+            "description": "The routing rule action type needs to considered for filter</br> it must be one of the items in this list [allow, deny, reject, limit]",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "type": "integer",
+            "default": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all deleted UFW routing rule records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedRoute"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:44:42\", \"result\": [{ \"add_date\": \"2021-05-05T12:25:25.659918\", \"adder_user_id\": 1, \"delete_date\": \"2021-05-05T12:26:47.934216\", \"deleter_user_id\": 2, \"id\": 5, \"route_command\": \"route deny in on eth0 out on wlan0 from 2001:db8::/32 port 80 to 2002:4559:1FE2::4559:1FE2 port 30 proto tcp comment test2\" }], \"total\": 1 }"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No UFW deleted rule found with this rule action type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 18:23:43\", \"result\": \"No rule with this type found\", \"total\": 0 }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/list_unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"total\": 0, \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
+      }
+    },
     "/status": {
       "get": {
         "tags": [
@@ -1787,7 +2623,7 @@
         "tags": [
           "UFW Manager"
         ],
-        "description": "You can reset UFW service. <br/> <b>Warning: use this with extra caution. because all rules will be deleted, and UFW service will be disabled</b>",
+        "description": "You can reset UFW service. <br/> <b>Warning: use this with extra caution. because all rules/routes will be deleted, and UFW service will be disabled</b>",
         "responses": {
           "200": {
             "description": "UFW service reseted",
@@ -1914,6 +2750,85 @@
             "type": "string"
           },
           "in_out": {
+            "type": "string"
+          },
+          "from_IP": {
+            "type": "string"
+          },
+          "from_port": {
+            "type": "string"
+          },
+          "from_service_name": {
+            "type": "string"
+          },
+          "to_IP": {
+            "type": "string"
+          },
+          "to_port": {
+            "type": "string"
+          },
+          "to_service_name": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "add_date": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          }
+        }
+      },
+      "DeletedRoute": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "adder_user_id": {
+            "type": "integer"
+          },
+          "add_date": {
+            "type": "string"
+          },
+          "deleter_user_id": {
+            "type": "integer"
+          },
+          "delete_date": {
+            "type": "string"
+          },
+          "route_command": {
+            "type": "string"
+          }
+        }
+      },
+      "Route": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "route_command": {
+            "type": "string"
+          },
+          "route_action": {
+            "type": "string"
+          },
+          "_in": {
+            "type": "string"
+          },
+          "in_on": {
+            "type": "string"
+          },
+          "_out": {
+            "type": "string"
+          },
+          "out_on": {
             "type": "string"
           },
           "from_IP": {
@@ -2107,6 +3022,23 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Rule"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      },
+      "get_routes_200": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Route"
             }
           },
           "total": {

@@ -1,3 +1,4 @@
+from models.route import Route
 import subprocess
 from ipaddress import ip_address, IPv4Address
 from datetime import datetime, timedelta
@@ -9,6 +10,8 @@ from sqlalchemy import or_, and_, func
 from models.status import Status, status_schema, statuses_schema
 from models.rule import Rule, rule_schema, rules_schema
 from models.deleted_rule import DeletedRule, deleted_rule_schema, deleted_rules_schema
+from models.route import Route, route_schema, routes_schema
+from models.deleted_route import DeletedRoute, deleted_route_schema, deleted_routes_schema
 from models.user import User, user_schema
 from models.service import Service, service_schema, services_schema
 from utilities.db_manager import db
@@ -299,6 +302,7 @@ def get_rules_by_user_id():
             rules = Rule.query.filter_by(user_id=userId).paginate(
                 page, per_page, error_out=False)
             total = rules.total
+            rules = rules.items
         if total is not None and total > 0:
             result = rules_schema.dump(rules)
             output = {
@@ -581,6 +585,369 @@ def get_deleted_rules_by_type():
     return jsonify(output), status_code
 
 
+@ufw_manager_blueprint.route("/get_all_routes", methods=["GET"])
+@jwt_required(fresh=True)
+@cross_origin()
+def get_all_routes():
+    remote_ip = request.remote_addr
+    output = {}
+    status_code = 200
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    page = sanitizer(request.args.get("page", "1"))
+    page = int(page) if page is not None and page.isdigit() else 1
+    per_page = sanitizer(request.args.get("perPage", "5"))
+    per_page = int(
+        per_page) if per_page is not None and per_page.isdigit() else 5
+    log_msg = ""
+    log_tag = "INFO"
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.manager_privileges:
+        routes = Route.query.paginate(
+            page, per_page, error_out=False)
+        total = routes.total
+        routes = routes.items
+        if total is not None and total > 0:
+            result = routes_schema.dump(routes)
+            output = {
+                "result": result,
+                "total": total,
+                "date": now
+            }
+        else:
+            output = {
+                "result": "No route found",
+                "total": 0,
+                "date": now
+            }
+            status_code = 404
+
+        log_msg = f"{remote_ip} get all routes UFW records as {test}"
+    else:
+        log_msg = f"{remote_ip} tried to get all route UFW records as {test} and failed because of Unauthorized user"
+        log_tag = "ALERT"
+        output = {
+            "result": "Unauthorized user",
+            "total": 0,
+            "date": now
+        }
+        status_code = 403
+
+    add_log(log_msg, log_tag)
+
+    return jsonify(output), status_code
+
+
+@ufw_manager_blueprint.route("/get_routes_by_user_id", methods=["GET"])
+@jwt_required(fresh=True)
+@cross_origin()
+def get_routes_by_user_id():
+    remote_ip = request.remote_addr
+    output = {}
+    status_code = 200
+    userId = sanitizer(request.args.get("userId"))
+    userId = int(userId) if userId is not None and userId.isnumeric() else 0
+
+    page = sanitizer(request.args.get("page", "1"))
+    page = int(page) if page is not None and page.isdigit() else 1
+    per_page = sanitizer(request.args.get("perPage", "5"))
+    per_page = int(
+        per_page) if per_page is not None and per_page.isdigit() else 5
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_msg = ""
+    log_tag = "INFO"
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.admin_privileges:
+        routes = None
+        total = 0
+        if userId != 0:
+            routes = Route.query.filter_by(user_id=userId).paginate(
+                page, per_page, error_out=False)
+            total = routes.total
+            routes = routes.items
+        if total is not None and total > 0:
+            result = routes_schema.dump(routes)
+            output = {
+                "result": result,
+                "total": total,
+                "date": now
+            }
+        else:
+            output = {
+                "result": "No route found",
+                "total": 0,
+                "date": now
+            }
+            status_code = 404
+
+        log_msg = f"{remote_ip} get UFW route records as {test} for user_id: {str(userId)}"
+    else:
+        log_msg = f"{remote_ip} tried get UFW route records as {test} and failed because of Unauthorized user"
+        log_tag = "ALERT"
+
+        output = {
+            "result": "Unauthorized user",
+            "total": 0,
+            "date": now
+        }
+        status_code = 403
+
+    add_log(log_msg, log_tag)
+
+    return jsonify(output), status_code
+
+
+@ufw_manager_blueprint.route("/get_routes_by_type", methods=["GET"])
+@jwt_required(fresh=True)
+@cross_origin()
+def get_routes_by_type():
+    remote_ip = request.remote_addr
+    output = {}
+    status_code = 200
+    routeAction = sanitizer(request.args.get("routeAction", "all"))
+
+    page = sanitizer(request.args.get("page", "1"))
+    page = int(page) if page is not None and page.isdigit() else 1
+    per_page = sanitizer(request.args.get("perPage", "5"))
+    per_page = int(
+        per_page) if per_page is not None and per_page.isdigit() else 5
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_msg = ""
+    log_tag = "INFO"
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.admin_privileges:
+        routes = Route.query.filter_by(
+            route_action=routeAction).paginate(
+            page, per_page, error_out=False)
+        total = routes.total
+        routes = routes.items
+        if total is not None and total > 0:
+            result = routes_schema.dump(routes)
+            output = {
+                "result": result,
+                "total": total,
+                "date": now
+            }
+        else:
+            output = {
+                "result": "No route found",
+                "total": 0,
+                "date": now
+            }
+            status_code = 404
+
+        log_msg = f"{remote_ip} get routes with action type '{routeAction}' as {test}"
+    else:
+        log_msg = f"{remote_ip} tried to get routes with action type '{routeAction}' as {test} and failed because of Unauthorized user"
+        log_tag = "ALERT"
+
+        output = {
+            "result": "Unauthorized user",
+            "total": 0,
+            "date": now
+        }
+        status_code = 403
+
+    add_log(log_msg, log_tag)
+
+    return jsonify(output), status_code
+
+
+@ufw_manager_blueprint.route("/get_all_deleted_routes", methods=["GET"])
+@jwt_required(fresh=True)
+def get_all_deleted_routes():
+    remote_ip = request.remote_addr
+    output = {}
+    status_code = 200
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    page = sanitizer(request.args.get("page", "1"))
+    page = int(page) if page is not None and page.isdigit() else 1
+    per_page = sanitizer(request.args.get("perPage", "5"))
+    per_page = int(
+        per_page) if per_page is not None and per_page.isdigit() else 5
+    log_msg = ""
+    log_tag = "INFO"
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.manager_privileges:
+        routes = DeletedRoute.query.paginate(
+            page, per_page, error_out=False)
+        total = routes.total
+        routes = routes.items
+        if total is not None and total > 0:
+            result = deleted_routes_schema.dump(routes)
+            output = {
+                "result": result,
+                "total": total,
+                "date": now
+            }
+        else:
+            output = {
+                "result": "No deleted route found",
+                "total": 0,
+                "date": now
+            }
+            status_code = 404
+        log_msg = f"{remote_ip} get all deleted routes UFW records as {test}"
+    else:
+        log_msg = f"{remote_ip} tried to get all deleted routes UFW records as {test} and failed because of Unauthorized user"
+        log_tag = "ALERT"
+        output = {
+            "result": "Unauthorized user",
+            "date": now
+        }
+        status_code = 403
+
+    add_log(log_msg, log_tag)
+
+    return jsonify(output), status_code
+
+
+@ ufw_manager_blueprint.route("/get_deleted_routes_by_user_id", methods=["GET"])
+@ jwt_required(fresh=True)
+@ cross_origin()
+def get_deleted_routes_by_user_id():
+    remote_ip = request.remote_addr
+    output = []
+    status_code = 200
+
+    page = sanitizer(request.args.get("page", "1"))
+    page = int(page) if page is not None and page.isdigit() else 1
+    per_page = sanitizer(request.args.get("perPage", "5"))
+    per_page = int(
+        per_page) if per_page is not None and per_page.isdigit() else 5
+
+    deleter_userId = request.args.get("deleterUserId")
+    if deleter_userId is None or not deleter_userId.isnumeric():
+        deleter_userId = 0
+    else:
+        deleter_userId = int(deleter_userId)
+    adder_userId = request.args.get("adderUserId")
+    if adder_userId is None or not adder_userId.isnumeric():
+        adder_userId = 0
+    else:
+        adder_userId = int(adder_userId)
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_msg = ""
+    log_tag = "INFO"
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.admin_privileges:
+        routes = None
+        if deleter_userId != 0 or adder_userId != 0:
+            routes = DeletedRoute.query.filter(
+                or_(DeletedRoute.deleter_user_id == deleter_userId,
+                    DeletedRoute.adder_user_id == adder_userId)).paginate(
+                page, per_page, error_out=False)
+            total = routes.total
+            routes = routes.items
+            if total is not None and total > 0:
+                result = deleted_routes_schema.dump(routes)
+                output = {
+                    "result": result,
+                    "total": total,
+                    "date": now
+                }
+            else:
+                output = {
+                    "result": "No deleted route with these ids found",
+                    "total": 0,
+                    "date": now
+                }
+                status_code = 404
+
+        log_msg = f"{remote_ip} get UFW deleted route records as {test} for deleter_user_id: {str(deleter_userId)} or adder_user_id: {str(adder_userId)}"
+    else:
+        log_msg = f"{remote_ip} tried get UFW deleted route records as {test} and failed because of Unauthorized user"
+        log_tag = "ALERT"
+        output = {
+            "result": "Unauthorized user",
+            "date": now
+        }
+        status_code = 403
+
+    add_log(log_msg, log_tag)
+
+    return jsonify(output), status_code
+
+
+@ ufw_manager_blueprint.route("/get_deleted_routes_by_type", methods=["GET"])
+@ jwt_required(fresh=True)
+@ cross_origin()
+def get_deleted_routes_by_type():
+    remote_ip = request.remote_addr
+    output = []
+    status_code = 200
+    page = sanitizer(request.args.get("page", "1"))
+    page = int(page) if page is not None and page.isdigit() else 1
+    per_page = sanitizer(request.args.get("perPage", "5"))
+    per_page = int(
+        per_page) if per_page is not None and per_page.isdigit() else 5
+    routeAction = sanitizer(request.args.get("routeAction"))
+    if routeAction is None or routeAction.lower() not in rule_actions:
+        routeAction = "all"
+    else:
+        routeAction = routeAction.lower()
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_msg = ""
+    log_tag = "INFO"
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.admin_privileges:
+        routes = None
+        if routeAction != "all":
+            routes = DeletedRoute.query.filter(
+                DeletedRoute.route_command.like(f"%{routeAction}%")).paginate(
+                page, per_page, error_out=False)
+            total = routes.total
+            routes = routes.items
+            if total is not None and total > 0:
+                result = deleted_routes_schema.dump(routes)
+                output = {
+                    "result": result,
+                    "total": total,
+                    "date": now
+                }
+            else:
+                output = {
+                    "result": "No route with this type found",
+                    "total": 0,
+                    "date": now
+                }
+                status_code = 404
+        else:
+            routes = DeletedRoute.query.paginate(
+                page, per_page, error_out=False)
+            total = routes.total
+            routes = routes.items
+            result = deleted_routes_schema.dump(routes)
+            output = {
+                "result": result,
+                "total": total,
+                "date": now
+            }
+
+        log_msg = f"{remote_ip} get deleted routes with action type '{routeAction}' as {test}"
+    else:
+        log_msg = f"{remote_ip} tried to get deleted routes with action type '{routeAction}' as {test} and failed because of Unauthorized user"
+        log_tag = "ALERT"
+        output = {
+            "result": "Unauthorized user",
+            "date": now
+        }
+        status_code = 403
+
+    add_log(log_msg, log_tag)
+
+    return jsonify(output), status_code
+
+
 @ ufw_manager_blueprint.route("/status", methods=["GET"])
 @ jwt_required(fresh=True)
 @ cross_origin()
@@ -757,9 +1124,6 @@ def reload():
 
     return jsonify(output), status_code
 
-# TODO delete all rule and delete them
-# from rule table and add them to deleted rule
-
 
 @ufw_manager_blueprint.route("/reset", methods=["GET"])
 @ jwt_required(fresh=True)
@@ -768,7 +1132,6 @@ def reset():
     remote_ip = request.remote_addr
     output = {}
     status_code = 200
-    now_datetime_obj = datetime.now()
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_msg = ""
     log_tag = "INFO"
@@ -778,9 +1141,22 @@ def reset():
         cmd = ["ufw", "--force", "reset"]
         result = run_cmd(cmd)
         if "Backing up" in result:
-            Rule.query.delete()
+            rules = Rule.query.all()
+            for rule in rules:
+                deleted_rule = DeletedRule(
+                    adder_user_id=rule.user_id, deleter_user_id=test.id, rule_command=rule.rule_command,
+                    add_date=rule.add_date)
+                db.session.delete(rule)
+                db.session.add(deleted_rule)
+            routes = Route.query.all()
+            for route in routes:
+                deleted_route = DeletedRoute(
+                    adder_user_id=route.user_id, deleter_user_id=test.id, route_command=route.route_command,
+                    add_date=route.add_date)
+                db.session.delete(route)
+                db.session.add(deleted_route)
             db.session.commit()
-            result = "all rule deleted and ufw disabled"
+            result = "all rules/routes deleted and ufw disabled"
         output = {
             "result": result,
             "date": now
@@ -820,6 +1196,8 @@ def add_rule():
         json_data = request.get_json()
         rule_action = sanitizer(json_data.get("rule_action"))
         if rule_action is not None:
+            enable_cmd = ["ufw", "enable"]
+            enable_result = run_cmd(enable_cmd)
             args_dict, cmd, is_args_list_set = set_args_for_rule(
                 args=json_data, rule_action=rule_action)
             if is_args_list_set:
@@ -984,9 +1362,9 @@ def delete_rule_by_id():
     test = User.query.filter_by(username=username).first()
     if test and test.manager_privileges:
         rule = None
-        if rule_id is not None:
+        if rule_id is not None and rule_id != "0":
             rule = Rule.query.filter_by(id=rule_id)
-            if rule.first:
+            if rule.first() is not None:
                 rule = rule.first()
                 cmd = "ufw delete " + rule.rule_command
                 cmd = cmd.split(" ")
@@ -1033,6 +1411,248 @@ def delete_rule_by_id():
     return jsonify(output), status_code
 
 
+@ ufw_manager_blueprint.route("/add_route", methods=["POST"])
+@ jwt_required(fresh=True)
+@ cross_origin()
+def add_route():
+    remote_ip = request.remote_addr
+    output = {}
+    status_code = 200
+    log_msg = ""
+    log_tag = "INFO"
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.manager_privileges:
+        json_data = request.get_json()
+        route_action = sanitizer(json_data.get("route_action"))
+        if route_action is not None:
+            enable_cmd = ["ufw", "enable"]
+            enable_result = run_cmd(enable_cmd)
+            args_dict, cmd, is_args_list_set = set_args_for_route(
+                args=json_data, route_action=route_action)
+            if is_args_list_set:
+
+                from_service_name = None
+                to_service_name = None
+                if args_dict.get("from_service_name") is not None:
+                    from_service_name = args_dict.pop("from_service_name")
+                if args_dict.get("to_service_name") is not None:
+                    to_service_name = args_dict.pop("to_service_name")
+                result = run_cmd(cmd)
+                cmd.remove("ufw")
+                route_command = " ".join(cmd)
+                if "Rule added" in result:
+                    route = Route(
+                        user_id=test.id, route_command=route_command,
+                        route_action=route_action)
+
+                    if args_dict.get("_in") is not None:
+                        route._in = args_dict.get("_in")
+                    if args_dict.get("in_on") is not None:
+                        route.in_on = args_dict.get("in_on")
+                    if args_dict.get("_out") is not None:
+                        route._out = args_dict.get("_out")
+                    if args_dict.get("out_on") is not None:
+                        route.out_on = args_dict.get("out_on")
+                    if args_dict.get("from_IP") is not None:
+                        route.from_IP = args_dict.get("from_IP")
+                    if args_dict.get("from_port") is not None:
+                        route.from_port = args_dict.get("from_port")
+                    if from_service_name is not None:
+                        route.from_service_name = from_service_name
+                    if args_dict.get("to_IP") is not None:
+                        route.to_IP = args_dict.get("to_IP")
+                    if args_dict.get("to_port") is not None:
+                        route.to_port = args_dict.get("to_port")
+                    if to_service_name is not None:
+                        route.to_service_name = to_service_name
+
+                    if args_dict.get("protocol") is not None:
+                        route.protocol = args_dict.get("protocol")
+                    else:
+                        route.protocol = "tcp/udp"
+
+                    if args_dict.get("comment") is not None:
+                        route.comment = args_dict.get("comment")
+
+                    db.session.add(route)
+                    db.session.commit()
+                    log_msg = f"{remote_ip} as {test} add this route: '{route_command}' "
+                elif "Rule updated" in result or "WARN: Rule changed after normalization" in result:
+                    query_filter = route_command.split(" comment")[0]
+                    route = Route.query.filter(
+                        Route.route_command.like(f"{query_filter}%")).first()
+                    print(route)
+                    route.route_command = route_command
+                    if args_dict.get("comment") is not None:
+                        route.comment = args_dict.get("comment")
+                    else:
+                        route.comment = None
+                    db.session.add(route)
+                    db.session.commit()
+                    log_msg = f"{remote_ip} as {test} update this route: '{route_command}' "
+                else:
+                    if "Skipping adding existing Rule" in result:
+                        log_msg = f"{remote_ip} as {test} tried to add this route: '{route_command}' but rule exist"
+                    else:
+                        log_msg = f"{remote_ip} as {test} tried to add this route: '{route_command}' but failed because of {result}"
+            else:
+                result = "Bad request."
+                status_code = 400
+                log_msg = f"{remote_ip} as {test} tried to add route to UFW and failed because bad request"
+        else:
+            result = "Bad request."
+            status_code = 400
+            log_msg = f"{remote_ip} as {test} tried to add route to UFW and failed because bad request"
+    else:
+        result = "Unauthorized user"
+        log_msg = f"{remote_ip} as {test} tried to add route to UFW and failed because of Unauthorized user"
+        log_tag = "ALERT"
+        status_code = 403
+
+    if result == "" or result is None:
+        result = "Bad requst something like -> Mixed IP versions for 'from' and 'to'"
+        status_code = 400
+
+    output = {
+        "result": result,
+        "date": now
+    }
+
+    add_log(log_msg, log_tag=log_tag)
+
+    return jsonify(output), status_code
+
+
+@ ufw_manager_blueprint.route("/delete_route", methods=["POST"])
+@ jwt_required(fresh=True)
+@ cross_origin()
+def delete_route():
+    remote_ip = request.remote_addr
+    output = {}
+    status_code = 200
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_msg = ""
+    log_tag = "INFO"
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.manager_privileges:
+        json_data = request.get_json()
+        args_dict, cmd, is_args_list_set = set_args_for_route(
+            args=json_data, route_action="delete")
+        if is_args_list_set:
+            result = run_cmd(cmd)
+            cmd.remove("ufw")
+            cmd.remove("delete")
+            route_command = " ".join(cmd)
+            route = Route.query.filter_by(route_command=route_command).first()
+            if route:
+                db.session.delete(route)
+                db.session.commit()
+                log_msg = f"{remote_ip} as {test} delete this route: '{route_command}'"
+                deleted_route = DeletedRoute(
+                    adder_user_id=route.user_id, deleter_user_id=test.id, route_command=route_command,
+                    add_date=route.add_date)
+                db.session.add(deleted_route)
+                db.session.commit()
+                add_log(
+                    f"{remote_ip} as {test} add deleted route to delete_route table")
+            else:
+                log_msg = f"{remote_ip} as {test} tried to delete this route: '{route_command}' and failed because route not exist"
+        else:
+            result = "Bad request."
+            status_code = 400
+            log_msg = f"{remote_ip} as {test} tried to delete route from UFW and failed because bad request"
+
+    else:
+        result = "Unauthorized user"
+        log_msg = f"{remote_ip} as {test} tried to delete route from UFW and failed because of Unauthorized user"
+        log_tag = "ALERT"
+        status_code = 403
+
+    if result == "" or result is None:
+        result = "Bad requst something like -> Mixed IP versions for 'from' and 'to'"
+        status_code = 400
+
+    output = {
+        "result": result,
+        "date": now
+    }
+
+    add_log(log_msg, log_tag=log_tag)
+
+    return jsonify(output), status_code
+
+
+@ ufw_manager_blueprint.route("/delete_route_by_id", methods=["POST"])
+@ jwt_required(fresh=True)
+@ cross_origin()
+def delete_route_by_id():
+    remote_ip = request.remote_addr
+    output = {}
+    status_code = 200
+    json_data = request.get_json()
+    route_id = sanitizer(json_data.get("routeId", 0))
+    print(type(route_id))
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_msg = ""
+    log_tag = "INFO"
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.manager_privileges:
+        route = None
+        if route_id is not None and route_id != "0":
+            route = Route.query.filter_by(id=route_id)
+            if route.first() is not None:
+                route = route.first()
+                route_command = route.route_command.split(" ")
+                route_command.insert(1, "delete")
+                route_command.insert(0, "ufw")
+                cmd = route_command
+                result = run_cmd(cmd)
+                deleted_route = DeletedRoute(
+                    adder_user_id=route.user_id, deleter_user_id=test.id, route_command=route.route_command,
+                    add_date=route.add_date)
+                db.session.delete(route)
+                db.session.add(deleted_route)
+                db.session.commit()
+
+                log_msg = f"{remote_ip} as {test} delete this route: '{route.route_command}'"
+                add_log(
+                    f"{remote_ip} as {test} add deleted route to delete_route table")
+            else:
+                result = f"there is no route with route id: {route_id}"
+                status_code = 404
+            output = {
+                "result": result,
+                "date": now
+            }
+
+        else:
+            result = "Bad Request you need to send route ID as routeId in json."
+            output = {
+                "result": result,
+                "date": now
+            }
+            status_code = 400
+
+        log_msg = f"{remote_ip} as {test} delete this route {route_id} as {test}"
+    else:
+        log_msg = f"{remote_ip} tried to delete this route {route_id} as {test} and failed because of Unauthorized user"
+        log_tag = "ALERT"
+
+        output = {
+            "result": "Unauthorized user",
+            "date": now
+        }
+        status_code = 403
+
+    add_log(log_msg, log_tag)
+
+    return jsonify(output), status_code
+
+
 def set_args_for_rule(args, rule_action):
     args_dict = {"ufw": "ufw", "rule_action": rule_action}
     is_args_list_set = False
@@ -1042,7 +1662,7 @@ def set_args_for_rule(args, rule_action):
         if rule_type_delete is not None:
             args_dict["rule_type_delete"] = rule_type_delete
         else:
-            return None, is_args_list_set
+            return None, None, is_args_list_set
 
     protocol = None
     in_out = sanitizer(args.get("in_out"))
@@ -1050,6 +1670,150 @@ def set_args_for_rule(args, rule_action):
         args_dict["in_out"] = "out"
     else:
         args_dict["in_out"] = "in"
+
+    args_dict["from"] = "from"
+    from_IP = sanitizer(args.get("from_IP"))
+    if from_IP is not None and validIPAddress(from_IP) != "invalid":
+        args_dict["from_IP"] = from_IP
+    else:
+        args_dict["from_IP"] = "any"
+
+    from_service_name = sanitizer(args.get("from_service_name"))
+    if from_service_name is not None:
+        services = Service.query.filter_by(
+            service_name=from_service_name).all()
+        port = ""
+        if len(services) == 1:
+            portAndProto = services[0].service_port.split("/")
+            port = portAndProto[0]
+            protocol = portAndProto[1]
+        elif len(services) > 1:
+            port = services[0].service_port.split("/")[0]
+        args_dict["from_service_name"] = from_service_name
+        args_dict["f_port"] = "port"
+        args_dict["from_port"] = f"{port}"
+    else:
+        port = sanitizer(args.get("from_port"))
+        if port is not None:
+            args_dict["f_port"] = "port"
+            args_dict["from_port"] = f"{port}"
+
+    args_dict["to"] = "to"
+    to_IP = sanitizer(args.get("to_IP"))
+    if to_IP is not None and validIPAddress(to_IP) != "invalid":
+        args_dict["to_IP"] = to_IP
+    else:
+        args_dict["to_IP"] = "any"
+
+    to_service_name = sanitizer(args.get("to_service_name"))
+    if to_service_name is not None:
+        services = Service.query.filter_by(service_name=to_service_name).all()
+        if len(services) == 1:
+            portAndProto = services[0].service_port.split("/")
+            port = portAndProto[0]
+            protocol = portAndProto[1]
+        elif len(services) > 1:
+            port = services[0].service_port.split("/")[0]
+        args_dict["to_service_name"] = to_service_name
+        args_dict["t_port"] = "port"
+        args_dict["to_port"] = f"{port}"
+    else:
+        port = sanitizer(args.get("to_port"))
+        if port is not None:
+            args_dict["t_port"] = "port"
+            args_dict["to_port"] = f"{port}"
+
+    _protocol = sanitizer(args.get("protocol"))
+    if _protocol is not None and _protocol in rule_protocols:
+        index = rule_protocols.index(_protocol)
+        if 0 < index <= 2:
+            args_dict["proto"] = "proto"
+            args_dict["protocol"] = _protocol
+        elif index > 2:
+            if _protocol == "ah" or _protocol == "esp" or _protocol == "gre":
+                if args_dict.get("from_port"):
+                    args_dict.pop("f_port")
+                    args_dict.pop("from_port")
+                if args_dict.get("to_port"):
+                    args_dict.pop("t_port")
+                    args_dict.pop("to_port")
+                args_dict["proto"] = "proto"
+                args_dict["protocol"] = _protocol
+            elif _protocol == "ipv6" or _protocol == "igmp":
+                is_from_IPv4 = (
+                    validIPAddress(from_IP) == "IPv4" or validIPAddress(from_IP) == "invalid")
+                is_to_IPv4 = (
+                    validIPAddress(to_IP) == "IPv4" or validIPAddress(to_IP) == "invalid")
+                if not is_from_IPv4 or not is_to_IPv4:
+                    args_dict["proto"] = "proto"
+                    args_dict["protocol"] = _protocol
+                    if not is_from_IPv4:
+                        args_dict["from_IP"] = "any"
+                    if args_dict.get("from_port"):
+                        args_dict.pop("f_port")
+                        args_dict.pop("from_port")
+                    if not is_to_IPv4:
+                        args_dict["to_IP"] = "any"
+                    if args_dict.get("to_port"):
+                        args_dict.pop("t_port")
+                        args_dict.pop("to_port")
+    elif protocol is not None:
+        args_dict["proto"] = "proto"
+        args_dict["protocol"] = protocol
+
+    comment = sanitizer(args.get("comment"))
+    if comment is not None and comment != "" and len(comment) <= 255:
+        args_dict["has_comment"] = "comment"
+        args_dict["comment"] = f'{comment}'
+    elif comment is not None and len(comment) > 255:
+        args_dict["has_comment"] = "comment"
+        args_dict["comment"] = 'your comment is too long'
+
+    if args_dict.get("from_service_name") is None and args_dict.get("protocol") is not None and args_dict.get("from_port") is not None:
+        from_service_name = Service.query.filter_by(
+            service_port=f'{args_dict["from_port"]}/{args_dict["protocol"]}').first()
+        if from_service_name is not None:
+            args_dict["from_service_name"] = from_service_name.service_name
+
+    if args_dict.get("to_service_name") is None and args_dict.get("protocol") is not None and args_dict.get("to_port") is not None:
+        to_service_name = Service.query.filter_by(
+            service_port=f'{args_dict["to_port"]}/{args_dict["protocol"]}').first()
+        if to_service_name is not None:
+            args_dict["to_service_name"] = to_service_name.service_name
+    is_args_list_set = True
+    args_list = [args_dict[key] for key in args_dict if key !=
+                 "from_service_name" and key != "to_service_name"]
+    return args_dict, args_list, is_args_list_set
+
+
+def set_args_for_route(args, route_action):
+    args_dict = {"ufw": "ufw", "route": "route", "route_action": route_action}
+    is_args_list_set = False
+
+    if route_action == "delete":
+        route_type_delete = sanitizer(args.get("route_type_delete"))
+        if route_type_delete is not None:
+            args_dict["route_type_delete"] = route_type_delete
+        else:
+            return None, None, is_args_list_set
+
+    protocol = None
+    _in = sanitizer(args.get("_in"))
+    if _in is not None:
+        in_on = sanitizer(args.get("in_on"))
+        args_dict["_in"] = "in"
+        if in_on is not None:
+            args_dict["on_in"] = "on"
+            args_dict["in_on"] = in_on
+
+    _out = sanitizer(args.get("_out"))
+    out_on = sanitizer(args.get(""))
+    if _out is not None:
+        out_on = sanitizer(args.get("out_on"))
+        args_dict["_out"] = "out"
+        if out_on is not None:
+            args_dict["on_out"] = "on"
+            args_dict["out_on"] = out_on
 
     args_dict["from"] = "from"
     from_IP = sanitizer(args.get("from_IP"))

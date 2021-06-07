@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react'
-import DeletedRuleListItem from './deleted-rule-list-item';
+import DeletedRouteListItem from './deleted-route-list-item';
 import Paginator from './paginator';
 import {
     Container, Row, Form,
@@ -8,7 +8,7 @@ import {
 } from 'react-bootstrap';
 import baseURL from './baseURL.json';
 
-class DeletedRuleList extends Component {
+class DeletedRouteList extends Component {
     token;
     AdderId;
     DeleterId;
@@ -26,9 +26,9 @@ class DeletedRuleList extends Component {
         this.state = {
             isLoading: false,
             queryType: 0,
-            ruleType: "allow",
-            rules: [],
-            rule: undefined,
+            routeType: "allow",
+            routes: [],
+            route: undefined,
             message: undefined,
             activePage: 1,
             total: 0,
@@ -41,7 +41,7 @@ class DeletedRuleList extends Component {
     handlePageChange = (pageNumber) => {
         if (pageNumber > 0 && pageNumber <= this.state.pages &&
             pageNumber !== this.state.activePage) {
-            this.getRules(pageNumber, this.state.perPage)
+            this.getRoutes(pageNumber, this.state.perPage)
         }
     }
 
@@ -52,12 +52,12 @@ class DeletedRuleList extends Component {
         let queryInput1;
         switch (this.state.queryType) {
             case 1:
-                queryInput = <Form.Group key="RuleType" controlId="setting.RuleType">
-                    <Form.Label>Rule Type</Form.Label>
+                queryInput = <Form.Group key="RouteType" controlId="setting.RouteType">
+                    <Form.Label>Route Type</Form.Label>
                     <Form.Control as="select"
-                        value={this.state.ruleType}
+                        value={this.state.routeType}
                         onChange={element => {
-                            this.setState({ ruleType: element.currentTarget.value })
+                            this.setState({ routeType: element.currentTarget.value })
                         }}>
                         <option>allow</option>
                         <option>deny</option>
@@ -97,20 +97,20 @@ class DeletedRuleList extends Component {
         }
     }
 
-    getRules = async (activePage, perPage) => {
+    getRoutes = async (activePage, perPage) => {
         this.setState({ isLoading: true })
         let args = `?page=${activePage}` +
             `&perPage=${perPage}`
-        let endPoint = "get_all_deleted_rules"
+        let endPoint = "get_all_deleted_routes"
         switch (this.state.queryType) {
             case 1:
-                args += `&ruleAction=${this.state.ruleType}`
-                endPoint = "get_deleted_rules_by_type"
+                args += `&routeAction=${this.state.routeType}`
+                endPoint = "get_deleted_routes_by_type"
                 break
             case 2:
                 args += `&deleterUserId=${this.DeleterId}`
                 args += `&adderUserId=${this.AdderId}`
-                endPoint = "get_deleted_rules_by_user_id"
+                endPoint = "get_deleted_routes_by_user_id"
                 break
             default:
                 break
@@ -139,8 +139,8 @@ class DeletedRuleList extends Component {
 
                     this.setState({
                         isLoading: false,
-                        rules: [],
-                        rule: undefined,
+                        routes: [],
+                        route: undefined,
                         message: alertMsg,
                         activePage: 1,
                         total: 0,
@@ -152,7 +152,7 @@ class DeletedRuleList extends Component {
                 data => {
                     if (data) {
                         this.setState({
-                            rules: data.result,
+                            routes: data.result,
                             activePage: activePage,
                             total: data.total,
                             pages: Math.ceil(data.total / this.state.perPage),
@@ -165,7 +165,7 @@ class DeletedRuleList extends Component {
     }
 
     componentDidMount() {
-        this.getRules(this.state.activePage, this.state.perPage)
+        this.getRoutes(this.state.activePage, this.state.perPage)
     }
 
     render() {
@@ -190,7 +190,7 @@ class DeletedRuleList extends Component {
         return (
             <Container fluid>
                 <Row className="justify-content-md-center">
-                    <h1>Deleted Rules</h1>
+                    <h1>Deleted Routes</h1>
                 </Row>
                 {this.state.message !== undefined &&
                     <Row className="justify-content-md-center">
@@ -233,7 +233,7 @@ class DeletedRuleList extends Component {
                             </Form.Control>
                         </Form.Group>
                         <Button onClick={() => {
-                            this.getRules(
+                            this.getRoutes(
                                 1,
                                 this.state.perPage)
                         }}>Get</Button>
@@ -253,10 +253,10 @@ class DeletedRuleList extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {(this.state.rules.length > 0) && this.state.rules.map(rule =>
-                                <DeletedRuleListItem
-                                    key={rule.id}
-                                    rule={rule} />)
+                            {(this.state.routes.length > 0) && this.state.routes.map(route =>
+                                <DeletedRouteListItem
+                                    key={route.id}
+                                    route={route} />)
                             }
                         </tbody>
                     </Table>
@@ -267,7 +267,7 @@ class DeletedRuleList extends Component {
                             <p>{this.message}</p>
                             <button
                                 onClick={() =>
-                                    this.deleteRuleHandler(this.state.rule.id)}>Yes</button>
+                                    this.deleteRouteHandler(this.state.route.id)}>Yes</button>
                             <button
                                 onClick={this.reject}>NO</button>
                         </div>
@@ -286,4 +286,4 @@ class DeletedRuleList extends Component {
     }
 };
 
-export default DeletedRuleList;
+export default DeletedRouteList;
