@@ -1781,6 +1781,54 @@
           }
         ]
       }
+    },
+    "/reset": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can reset UFW service. <br/> <b>Warning: use this with extra caution. because all rules will be deleted, and UFW service will be disabled</b>",
+        "responses": {
+          "200": {
+            "description": "UFW service reseted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:25:00\", \"result\": \"all rule deleted and ufw disabled\n\" }"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
     }
   },
   "components": {

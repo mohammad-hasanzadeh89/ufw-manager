@@ -759,8 +759,47 @@ def reload():
 
 # TODO delete all rule and delete them
 # from rule table and add them to deleted rule
-# @ufw_manager_blueprint.route("/reset", methods=["GET"])
-# def reset():
+
+
+@ufw_manager_blueprint.route("/reset", methods=["GET"])
+@ jwt_required(fresh=True)
+@ cross_origin()
+def reset():
+    remote_ip = request.remote_addr
+    output = {}
+    status_code = 200
+    now_datetime_obj = datetime.now()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_msg = ""
+    log_tag = "INFO"
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.manager_privileges:
+        cmd = ["ufw", "--force", "reset"]
+        result = run_cmd(cmd)
+        if "Backing up" in result:
+            Rule.query.delete()
+            db.session.commit()
+            result = "all rule deleted and ufw disabled"
+        output = {
+            "result": result,
+            "date": now
+        }
+
+        log_msg = f"{remote_ip} as {test} tried to reset UFW with result {result}"
+    else:
+        log_msg = f"{remote_ip} as {test} tried to reset UFW and failed because of Unauthorized user"
+        log_tag = "ALERT"
+
+        output = {
+            "result": "Unauthorized user",
+            "date": now
+        }
+        status_code = 403
+
+    add_log(log_msg, log_tag)
+
+    return jsonify(output), status_code
 
 # TODO update rules table if rule add manually
 

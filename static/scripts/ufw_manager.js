@@ -190,6 +190,13 @@ class UFWManager extends Component {
                         aria-controls="confirm-box"
                         aria-expanded={this.state.showConfirmation}>
                         Disable UFW</Button>
+                    <Button
+                        variant="dark"
+                        onClick={
+                            () => this.showConfirmMessage("reset")}
+                        aria-controls="confirm-box"
+                        aria-expanded={this.state.showConfirmation}>
+                        Reset UFW</Button>
                 </Row>
 
                 <Modal
