@@ -147,12 +147,12 @@ class RuleList extends Component {
         let endPoint = "get_all_rules"
         switch (this.state.queryType) {
             case 1:
-                args += `& ruleAction=${this.state.ruleType}`
+                args += `&ruleAction=${this.state.ruleType}`
                 endPoint = "get_rules_by_type"
                 break
             case 2:
                 if (this.AdderId) {
-                    args += `& userId=${this.AdderId}`
+                    args += `&userId=${this.AdderId}`
                     endPoint = "get_rules_by_user_id"
                 }
                 break
