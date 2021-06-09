@@ -169,6 +169,13 @@ class UFWManager extends Component {
                 </Row>
                 <Row className="justify-content-md-center buttons-box-wrapper">
                     <Button
+                        variant="secondary"
+                        onClick={
+                            () => this.showConfirmMessage("update_rules")}
+                        aria-controls="confirm-box"
+                        aria-expanded={this.state.showConfirmation}>
+                        Update UFW<br /> Manual Changes</Button>
+                    <Button
                         variant="primary"
                         onClick={
                             () => this.statusWithDetail()}

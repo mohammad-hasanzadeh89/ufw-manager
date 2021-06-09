@@ -2417,6 +2417,54 @@
         ]
       }
     },
+    "/update_rules": {
+      "get": {
+        "tags": [
+          "UFW Manager"
+        ],
+        "description": "You can update routes and rules tables with rules that added or deleted manually in or from the UFW service",
+        "responses": {
+          "200": {
+            "description": "all tables updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ufw_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{ \"date\": \"2021-05-14 20:09:29\", \"result\": \"1 rules/routes updated and all tables are up to date.\"}"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/unauthorized_user_403"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"result\":\"Unauthorized user\", \"date\": \"2021-04-25 14:59:49\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": [
+              "admin",
+              "manager"
+            ]
+          }
+        ]
+      }
+    },
     "/status": {
       "get": {
         "tags": [

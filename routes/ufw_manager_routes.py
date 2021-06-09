@@ -77,13 +77,13 @@ def get_status_change_records_by_time():
     remote_ip = request.remote_addr
     output = {}
     status_code = 200
-    from_date = request.args.get("from_date")
+    from_date = sanitizer(request.args.get("from_date"))
     if from_date is None:
         from_date = datetime.min
     else:
         from_date = datetime.strptime(from_date, "%Y-%m-%d %H:%M:%S")
 
-    to_date = request.args.get("to_date")
+    to_date = sanitizer(request.args.get("to_date"))
     if to_date is None:
         to_date = datetime.now()
     else:
@@ -148,7 +148,7 @@ def get_status_change_records_by_user_id():
     remote_ip = request.remote_addr
     output = {}
     status_code = 200
-    userId = request.args.get("userId")
+    userId = sanitizer(request.args.get("userId"))
     page = sanitizer(request.args.get("page", "1"))
     page = int(page) if page is not None and page.isdigit() else 1
     per_page = sanitizer(request.args.get("perPage", "5"))
@@ -282,7 +282,13 @@ def get_rules_by_user_id():
     output = {}
     status_code = 200
     userId = sanitizer(request.args.get("userId"))
-    userId = int(userId) if userId is not None and userId.isnumeric() else 0
+    if userId is None or not userId.isnumeric():
+        if userId != "-404":
+            userId = 0
+        else:
+            userId = int(userId)
+    else:
+        userId = int(userId)
 
     page = sanitizer(request.args.get("page", "1"))
     page = int(page) if page is not None and page.isdigit() else 1
@@ -303,21 +309,27 @@ def get_rules_by_user_id():
                 page, per_page, error_out=False)
             total = rules.total
             rules = rules.items
-        if total is not None and total > 0:
-            result = rules_schema.dump(rules)
-            output = {
-                "result": result,
-                "total": total,
-                "date": now
-            }
+            if total is not None and total > 0:
+                result = rules_schema.dump(rules)
+                output = {
+                    "result": result,
+                    "total": total,
+                    "date": now
+                }
+            else:
+                output = {
+                    "result": "No rule found",
+                    "total": 0,
+                    "date": now
+                }
+                status_code = 404
         else:
             output = {
-                "result": "No rule found",
+                "result": "No route found",
                 "total": 0,
                 "date": now
             }
             status_code = 404
-
         log_msg = f"{remote_ip} get UFW rule records as {test} for user_id: {str(userId)}"
     else:
         log_msg = f"{remote_ip} tried get UFW rule records as {test} and failed because of Unauthorized user"
@@ -458,14 +470,20 @@ def get_deleted_rules_by_user_id():
     per_page = int(
         per_page) if per_page is not None and per_page.isdigit() else 5
 
-    deleter_userId = request.args.get("deleterUserId")
+    deleter_userId = sanitizer(request.args.get("deleterUserId"))
     if deleter_userId is None or not deleter_userId.isnumeric():
-        deleter_userId = 0
+        if deleter_userId != "-404":
+            deleter_userId = 0
+        else:
+            deleter_userId = int(deleter_userId)
     else:
         deleter_userId = int(deleter_userId)
-    adder_userId = request.args.get("adderUserId")
+    adder_userId = sanitizer(request.args.get("adderUserId"))
     if adder_userId is None or not adder_userId.isnumeric():
-        adder_userId = 0
+        if adder_userId != "-404":
+            adder_userId = 0
+        else:
+            adder_userId = int(adder_userId)
     else:
         adder_userId = int(adder_userId)
 
@@ -497,7 +515,13 @@ def get_deleted_rules_by_user_id():
                     "date": now
                 }
                 status_code = 404
-
+        else:
+            output = {
+                "result": "No route found",
+                "total": 0,
+                "date": now
+            }
+            status_code = 404
         log_msg = f"{remote_ip} get UFW deleted rule records as {test} for deleter_user_id: {str(deleter_userId)} or adder_user_id: {str(adder_userId)}"
     else:
         log_msg = f"{remote_ip} tried get UFW deleted rule records as {test} and failed because of Unauthorized user"
@@ -646,7 +670,13 @@ def get_routes_by_user_id():
     output = {}
     status_code = 200
     userId = sanitizer(request.args.get("userId"))
-    userId = int(userId) if userId is not None and userId.isnumeric() else 0
+    if userId is None or not userId.isnumeric():
+        if userId != "-404":
+            userId = 0
+        else:
+            userId = int(userId)
+    else:
+        userId = int(userId)
 
     page = sanitizer(request.args.get("page", "1"))
     page = int(page) if page is not None and page.isdigit() else 1
@@ -667,13 +697,20 @@ def get_routes_by_user_id():
                 page, per_page, error_out=False)
             total = routes.total
             routes = routes.items
-        if total is not None and total > 0:
-            result = routes_schema.dump(routes)
-            output = {
-                "result": result,
-                "total": total,
-                "date": now
-            }
+            if total is not None and total > 0:
+                result = routes_schema.dump(routes)
+                output = {
+                    "result": result,
+                    "total": total,
+                    "date": now
+                }
+            else:
+                output = {
+                    "result": "No route found",
+                    "total": 0,
+                    "date": now
+                }
+                status_code = 404
         else:
             output = {
                 "result": "No route found",
@@ -821,14 +858,20 @@ def get_deleted_routes_by_user_id():
     per_page = int(
         per_page) if per_page is not None and per_page.isdigit() else 5
 
-    deleter_userId = request.args.get("deleterUserId")
+    deleter_userId = sanitizer(request.args.get("deleterUserId"))
     if deleter_userId is None or not deleter_userId.isnumeric():
-        deleter_userId = 0
+        if deleter_userId != "-404":
+            deleter_userId = 0
+        else:
+            deleter_userId = int(deleter_userId)
     else:
         deleter_userId = int(deleter_userId)
-    adder_userId = request.args.get("adderUserId")
+    adder_userId = sanitizer(request.args.get("adderUserId"))
     if adder_userId is None or not adder_userId.isnumeric():
-        adder_userId = 0
+        if adder_userId != "-404":
+            adder_userId = 0
+        else:
+            adder_userId = int(adder_userId)
     else:
         adder_userId = int(adder_userId)
 
@@ -860,7 +903,13 @@ def get_deleted_routes_by_user_id():
                     "date": now
                 }
                 status_code = 404
-
+        else:
+            output = {
+                "result": "No deleted route with these ids found",
+                "total": 0,
+                "date": now
+            }
+            status_code = 404
         log_msg = f"{remote_ip} get UFW deleted route records as {test} for deleter_user_id: {str(deleter_userId)} or adder_user_id: {str(adder_userId)}"
     else:
         log_msg = f"{remote_ip} tried get UFW deleted route records as {test} and failed because of Unauthorized user"
@@ -1178,6 +1227,109 @@ def reset():
     return jsonify(output), status_code
 
 # TODO update rules table if rule add manually
+
+
+@ ufw_manager_blueprint.route("/update_rules", methods=["GET"])
+@ jwt_required(fresh=True)
+@ cross_origin()
+def update_rules():
+    remote_ip = request.remote_addr
+    output = {}
+    status_code = 200
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_msg = ""
+    log_tag = "INFO"
+    username = get_jwt_identity()
+    test = User.query.filter_by(username=username).first()
+    if test and test.manager_privileges:
+        cmd = ['ufw', 'show', 'added']
+        output = run_cmd(cmd)
+        output = output.splitlines()[1:]
+        output = [rule.replace("'", "").replace("ufw ", "") for rule in output]
+        routes = Route.query.all()
+        rules = Rule.query.all()
+        rules_update_counter = 0
+
+        for route in routes:
+            if route.route_command not in output:
+                deleted_route = DeletedRoute(
+                    adder_user_id=route.user_id,
+                    deleter_user_id=-404,
+                    route_command=route.route_command,
+                    add_date=route.add_date)
+                db.session.delete(route)
+                db.session.add(deleted_route)
+                rules_update_counter += 1
+            else:
+                output.remove(route.route_command)
+        for rule in rules:
+            if rule.rule_command not in output:
+                deleted_rule = DeletedRule(
+                    adder_user_id=rule.user_id,
+                    deleter_user_id=-404,
+                    rule_command=rule.rule_command,
+                    add_date=rule.add_date)
+                db.session.delete(rule)
+                db.session.add(deleted_rule)
+                rules_update_counter += 1
+            else:
+                output.remove(rule.rule_command)
+
+        for rule in output:
+            if rule.__contains__('(None)'):
+                break
+            action = ''
+            comment = None
+            for act in rule_actions:
+                if act in rule:
+                    action = act
+                    break
+            if 'comment' in rule:
+                comment = rule.split('comment ')[1]
+            if 'route' in rule:
+                route = Route(
+                    user_id=-404,
+                    route_command=rule,
+                    route_action=action)
+                if comment is not None:
+                    route.comment = comment
+                db.session.add(route)
+                rules_update_counter += 1
+            else:
+                in_out = 'in'
+                if 'out' in rule:
+                    in_out = 'out'
+
+                rule = Rule(
+                    user_id=-404,
+                    rule_command=rule,
+                    rule_action=action,
+                    in_out=in_out)
+                if comment is not None:
+                    rule.comment = comment
+                db.session.add(rule)
+                rules_update_counter += 1
+        db.session.commit()
+        result = f"{rules_update_counter} rules/routes updated and all tables are up to date."
+        output = {
+            "result": result,
+            "date": now
+        }
+
+        log_msg = f"{remote_ip} as {test} tried to update rules/routes table UFW with result {result}"
+    else:
+        log_msg = f"{remote_ip} as {test} tried to update rules/routes table UFW and failed because of Unauthorized user"
+        log_tag = "ALERT"
+
+        output = {
+            "result": "Unauthorized user",
+            "date": now
+        }
+        status_code = 403
+
+    add_log(log_msg, log_tag)
+
+    return jsonify(output), status_code
 
 
 @ ufw_manager_blueprint.route("/add_rule", methods=["POST"])
