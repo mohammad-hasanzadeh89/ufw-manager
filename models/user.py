@@ -14,6 +14,10 @@ class User(db.Model):
         to grant users manager_privileges.
         manager_privileges (bool): Indicate the user has authority
         to interact with UFW.
+        is_first (bool): Indicate user change password since
+        admin add it or reset it's password.
+        is_deleted (bool): Indicate admin delete this user or not
+        if value is true user can log in or any other stuff.
     """
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, nullable=False,
@@ -22,12 +26,18 @@ class User(db.Model):
     password = Column(String, nullable=False)
     admin_privileges = Column(Boolean, default=False, nullable=False)
     manager_privileges = Column(Boolean, default=False, nullable=False)
+    is_first = Column(Boolean, default=True, nullable=False)
+    is_deleted = Column(Boolean, default=False, nullable=False)
 
-    def __init__(self, username, password, admin_privileges, manager_privileges):
+    def __init__(self, username, password, admin_privileges,
+                 manager_privileges, is_first=True,
+                 is_deleted=False):
         self.username = username
         self.set_password(password)
         self.admin_privileges = admin_privileges
         self.manager_privileges = manager_privileges
+        self.is_first = is_first
+        self.is_deleted = is_deleted
 
     def set_password(self, password):
         """
@@ -66,7 +76,8 @@ class UserSchema(ma.Schema):
     This is a class that used as custom serializers for User Object.
     """
     class Meta:
-        fields = ("id", "username", "admin_privileges", "manager_privileges")
+        fields = ("id", "username", "admin_privileges",
+                  "manager_privileges", "is_first", "is_deleted")
 
 
 user_schema = UserSchema()

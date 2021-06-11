@@ -32,7 +32,7 @@ def get_all_user():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         users = User.query.paginate(
             page, per_page, error_out=False)
         total = users.total
@@ -80,7 +80,7 @@ def get_users():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         users = User.query.filter(
             or_(User.id == id,
                 User.username.like(f"%{query_username}%"))).paginate(
@@ -149,41 +149,51 @@ def get_user_privileges():
     return jsonify(output), status_code
 
 
-@user_api_blueprint.route("/signup", methods=["POST"])
+@user_api_blueprint.route("/add_user", methods=["POST"])
+@jwt_required(fresh=True)
 @cross_origin()
-def signup():
+def add_user():
     remote_ip = request.remote_addr
-    if request.is_json:
-        json_data = request.get_json()
-        username = sanitizer(json_data.get("username", ""))
-        password = sanitizer(json_data.get("password", ""))
+    output = []
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    admin = get_jwt_identity()
+    test = User.query.filter_by(username=admin).first()
+    if test and test.admin_privileges:
+        if request.is_json:
+            json_data = request.get_json()
+            username = sanitizer(json_data.get("username", ""))
+            password = sanitizer(json_data.get("password", ""))
 
-        test = User.query.filter_by(username=username).first()
-        if test:
-            add_log(
-                f"{remote_ip} tried to sign up with {username} and failed because the user exists")
-            return jsonify(
-                message="The username is not available."), 409
-        else:
-            if check_pass_is_strong(password):
-                new_user = User(username=username, password=password,
-                                admin_privileges=False, manager_privileges=False)
-                db.session.add(new_user)
-                db.session.commit()
-
+            test_user = User.query.filter_by(username=username).first()
+            if test_user:
                 add_log(
-                    f"{remote_ip} signup with {username} successfully")
-
-                return jsonify(message="Your username registered," +
-                               " contact your system administrator to get your access"), 201
+                    f"{remote_ip} as {test} tried to add new user with username: {username} and failed because the user exists")
+                return jsonify(
+                    message="The username is not available."), 409
             else:
-                add_log(
-                    f"{remote_ip} tried to signup with {username} and failed because of weak passwrod")
-            return jsonify(
-                message="the password needs to be more than 8 char" +
-                "and must be upper case, lower case, digits and symbols like Test123!"), 400
+                if check_pass_is_strong(password):
+                    new_user = User(username=username, password=password,
+                                    admin_privileges=False, manager_privileges=False)
+                    db.session.add(new_user)
+                    db.session.commit()
+
+                    add_log(
+                        f"{remote_ip} as {test} add new user with username: {username} successfully")
+
+                    return jsonify(
+                        message=f"new user added with username: {username}"), 201
+                else:
+                    add_log(
+                        f"{remote_ip} as {test} tried to add new user with username: {username} and failed because of weak passwrod")
+                    return jsonify(
+                        message="the password needs to be more than 8 char" +
+                        "and must be upper case, lower case, digits and symbols like Test123!"), 400
+        else:
+            return jsonify("Bad Request.\nyou need to send parameters as json object"), 400
     else:
-        return jsonify("Bad Request.\nyou need to send parameters as json object"), 400
+        add_log(
+            f"{remote_ip} try to add new user with username: {username} as {test}")
+        return jsonify(message="Unauthorized user"), 403
 
 
 @user_api_blueprint.route("/signin", methods=["POST"])
@@ -200,11 +210,16 @@ def signin():
         if user:
             is_password_right = user.verify_password(password)
             if is_password_right:
-                access_token = create_access_token(
-                    fresh=True, identity=username,
-                    expires_delta=timedelta(minutes=30))
-                add_log(f"{remote_ip} {user} logged in")
-                return jsonify(message="Login succeeded.", access_token=access_token)
+                if not user.is_deleted:
+                    access_token = create_access_token(
+                        fresh=True, identity=username,
+                        expires_delta=timedelta(minutes=30))
+                    add_log(f"{remote_ip} {user} logged in")
+                    return jsonify(message="Login succeeded.", access_token=access_token)
+                else:
+                    add_log(
+                        f"{remote_ip} tried to login as {username} and failed because of user deleted by admin")
+                    return jsonify(message="Your admin has deleted your user. If you need more information, contact your admin."), 404
             else:
                 add_log(
                     f"{remote_ip} tried to login as {username} and failed because of wrong password")
@@ -266,7 +281,7 @@ def grant_authorization():
         admin = get_jwt_identity()
         test = User.query.filter_by(username=admin).first()
         username = sanitizer(json_data.get("username", ""))
-        if test and test.admin_privileges:
+        if test and test.admin_privileges and not test.is_first:
             if username is None:
                 add_log(
                     f"{remote_ip} as admin try to grant manager privileges but failed because of not providing username")
@@ -303,7 +318,8 @@ def create_admin():
     admin = User.query.filter_by(username="admin").first()
     if not admin:
         new_user = User(username="admin", password="admin",
-                        admin_privileges=True, manager_privileges=True)
+                        admin_privileges=True,
+                        manager_privileges=True)
         add_log(f"admin created")
         db.session.add(new_user)
         db.session.commit()

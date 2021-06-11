@@ -37,7 +37,7 @@ def get_services():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         services = Service.query.all()
         if len(services) > 0:
             services = services_schema.dump(services)
@@ -102,7 +102,7 @@ def get_status_change_records_by_time():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         statuses = Status.query.filter(and_
                                        (from_date <= func.DATETIME(Status.change_date),
                                         func.DATETIME(Status.change_date) < to_date)).paginate(
@@ -164,7 +164,7 @@ def get_status_change_records_by_user_id():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         statuses = None
         if userId != 0:
             statuses = Status.query.filter_by(user_id=userId).paginate(
@@ -238,7 +238,7 @@ def get_all_rules():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         rules = Rule.query.paginate(
             page, per_page, error_out=False)
         total = rules.total
@@ -301,7 +301,7 @@ def get_rules_by_user_id():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         rules = None
         total = 0
         if userId != 0:
@@ -367,7 +367,7 @@ def get_rules_by_type():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
 
         rules = Rule.query.filter_by(
             rule_action=ruleAction).paginate(
@@ -422,7 +422,7 @@ def get_all_deleted_rules():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         rules = DeletedRule.query.paginate(
             page, per_page, error_out=False)
         total = rules.total
@@ -492,7 +492,7 @@ def get_deleted_rules_by_user_id():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         rules = None
         if deleter_userId != 0 or adder_userId != 0:
             rules = DeletedRule.query.filter(
@@ -560,7 +560,7 @@ def get_deleted_rules_by_type():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         rules = None
         if ruleAction != "all":
             rules = DeletedRule.query.filter(
@@ -626,7 +626,7 @@ def get_all_routes():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         routes = Route.query.paginate(
             page, per_page, error_out=False)
         total = routes.total
@@ -689,7 +689,7 @@ def get_routes_by_user_id():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         routes = None
         total = 0
         if userId != 0:
@@ -756,7 +756,7 @@ def get_routes_by_type():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         routes = Route.query.filter_by(
             route_action=routeAction).paginate(
             page, per_page, error_out=False)
@@ -810,7 +810,7 @@ def get_all_deleted_routes():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         routes = DeletedRoute.query.paginate(
             page, per_page, error_out=False)
         total = routes.total
@@ -880,7 +880,7 @@ def get_deleted_routes_by_user_id():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         routes = None
         if deleter_userId != 0 or adder_userId != 0:
             routes = DeletedRoute.query.filter(
@@ -948,7 +948,7 @@ def get_deleted_routes_by_type():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.admin_privileges:
+    if test and test.admin_privileges and not test.is_first:
         routes = None
         if routeAction != "all":
             routes = DeletedRoute.query.filter(
@@ -1009,7 +1009,7 @@ def status():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         cmd = ["ufw", "status"]
         status = run_cmd(cmd)
         status = (status.replace("-", " ").splitlines())
@@ -1051,7 +1051,7 @@ def enable():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         status = check_ufw_status()
         if "Status: active\n" not in status:
             cmd = ["ufw", "enable"]
@@ -1099,7 +1099,7 @@ def disable():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         status = check_ufw_status()
         if "Status: inactive\n" not in status:
             cmd = ["ufw", "disable"]
@@ -1149,7 +1149,7 @@ def reload():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         cmd = ["ufw", "reload"]
         result = run_cmd(cmd)
 
@@ -1186,7 +1186,7 @@ def reset():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         cmd = ["ufw", "--force", "reset"]
         result = run_cmd(cmd)
         if "Backing up" in result:
@@ -1226,8 +1226,6 @@ def reset():
 
     return jsonify(output), status_code
 
-# TODO update rules table if rule add manually
-
 
 @ ufw_manager_blueprint.route("/update_rules", methods=["GET"])
 @ jwt_required(fresh=True)
@@ -1241,7 +1239,7 @@ def update_rules():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         cmd = ['ufw', 'show', 'added']
         output = run_cmd(cmd)
         output = output.splitlines()[1:]
@@ -1344,7 +1342,7 @@ def add_rule():
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         json_data = request.get_json()
         rule_action = sanitizer(json_data.get("rule_action"))
         if rule_action is not None:
@@ -1450,7 +1448,7 @@ def delete_rule():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         json_data = request.get_json()
         args_dict, cmd, is_args_list_set = set_args_for_rule(
             args=json_data, rule_action="delete")
@@ -1512,7 +1510,7 @@ def delete_rule_by_id():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         rule = None
         if rule_id is not None and rule_id != "0":
             rule = Rule.query.filter_by(id=rule_id)
@@ -1575,7 +1573,7 @@ def add_route():
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         json_data = request.get_json()
         route_action = sanitizer(json_data.get("route_action"))
         if route_action is not None:
@@ -1689,7 +1687,7 @@ def delete_route():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         json_data = request.get_json()
         args_dict, cmd, is_args_list_set = set_args_for_route(
             args=json_data, route_action="delete")
@@ -1752,7 +1750,7 @@ def delete_route_by_id():
     log_tag = "INFO"
     username = get_jwt_identity()
     test = User.query.filter_by(username=username).first()
-    if test and test.manager_privileges:
+    if test and test.manager_privileges and not test.is_first:
         route = None
         if route_id is not None and route_id != "0":
             route = Route.query.filter_by(id=route_id)
