@@ -2,27 +2,6 @@ import React, { Component } from 'react';
 import { Container, Row, Col, Form, Button, Table, Badge } from 'react-bootstrap';
 import baseURL from './baseURL.json';
 
-
-
-const signupUser = async (_username, _password, _confirmPassword) => {
-    if (_username && _password && _confirmPassword) {
-        if (_password.normalize() === _confirmPassword.normalize()) {
-            return fetch(baseURL.url + 'signup', {
-                method: 'POST',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username: _username, password: _password })
-            }).then(data => data.json());
-        } else {
-            return { message: `Password and confirm password is not equal!` }
-        }
-    } else {
-        return { message: `Please enter respective value for all fields` }
-    }
-};
-
 const signinUser = async (_username, _password) => {
     if (_username && _password) {
         return fetch(baseURL.url + 'signin', {
@@ -56,7 +35,6 @@ class Auth extends Component {
     setIsManager;
     username;
     password;
-    confirmPassword;
     constructor(props) {
         super(props);
         this.setToken = props.setToken
@@ -74,20 +52,8 @@ class Auth extends Component {
     resetForm = () => {
         this.username = "";
         this.password = "";
-        this.confirmPassword = "";
     }
 
-    formSwitcher = () => {
-        let temp = !this.state.isNewUser
-        let title = temp ? "Sign Up" : "Sign In";
-        let signupOrSigninMsg = temp ? "Sign In instead" : "Create an account";
-        this.resetForm()
-        this.setState({
-            isNewUser: temp,
-            title: title,
-            signupOrSigninMsg: signupOrSigninMsg
-        });
-    }
 
     handleGetgUserPrivileges = async (token) => {
         const data = await getgUserPrivileges(token)
@@ -113,27 +79,12 @@ class Auth extends Component {
         }
     };
 
-    handleSignupSubmit = async e => {
-        e.preventDefault();
-        const data = await signupUser(
-            this.username,
-            this.password,
-            this.confirmPassword
-        )
-        if (data.message) {
-            this.setState({ message: data.message })
-        } else {
-            this.setState({ message: "something went wrong!" })
-        }
-    };
-
     render() {
         return (
             <div className="auth-wrapper" >
-
                 <Container fluid>
                     <Row className="justify-content-md-center">
-                        <h1>{this.state.title}</h1>
+                        <h1>Sign In</h1>
                     </Row>
 
                     {this.state.message !== undefined &&
@@ -146,96 +97,41 @@ class Auth extends Component {
                             </h3>
                         </Row>
                     }
-                    {
-                        !this.state.isNewUser ?
-                            <Row className="justify-content-md-center">
-                                <Form
-                                    onSubmit={this.handleSigninSubmit}>
-                                    <Form.Group controlId="signinForm.Username">
-                                        <Form.Label>User Name</Form.Label>
-                                        <Form.Control type="text"
-                                            placeholder="User Name"
-                                            defaultValue={this.username}
-                                            onChange={e => this.username = e.target.value}
-                                        />
-                                    </Form.Group>
-                                    <Form.Group controlId="signinForm.Password">
-                                        <Form.Label>Password</Form.Label>
-                                        <Form.Control type="password"
-                                            placeholder="Password"
-                                            defaultValue={this.password}
-                                            onChange={e => this.password = e.target.value} />
-                                    </Form.Group>
-                                    <Row className="fullwidth">
-                                        <Col>
-                                            <Button variant="success"
-                                                type="submit">
-                                                {this.state.title}
-                                            </Button>
-                                        </Col>
-                                        <Col>
-                                            <Button variant="danger"
-                                                type="reset"
-                                                onClick={this.resetForm}>
-                                                Reset
-                                                </Button>
-                                        </Col>
-                                    </Row>
-                                </Form>
+                    <Row className="justify-content-md-center">
+                        <Form
+                            onSubmit={this.handleSigninSubmit}>
+                            <Form.Group controlId="signinForm.Username">
+                                <Form.Label>User Name</Form.Label>
+                                <Form.Control type="text"
+                                    placeholder="User Name"
+                                    defaultValue={this.username}
+                                    onChange={e => this.username = e.target.value}
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="signinForm.Password">
+                                <Form.Label>Password</Form.Label>
+                                <Form.Control type="password"
+                                    placeholder="Password"
+                                    defaultValue={this.password}
+                                    onChange={e => this.password = e.target.value} />
+                            </Form.Group>
+                            <Row className="fullwidth">
+                                <Col>
+                                    <Button variant="success"
+                                        type="submit">
+                                        Sign In
+                                    </Button>
+                                </Col>
+                                <Col>
+                                    <Button variant="danger"
+                                        type="reset"
+                                        onClick={this.resetForm}>
+                                        Reset
+                                    </Button>
+                                </Col>
                             </Row>
-                            :
-                            <Row className="justify-content-md-center">
-                                <Form
-                                    onSubmit={this.handleSignupSubmit}>
-                                    <Form.Group controlId="signinForm.Username">
-                                        <Form.Label>User Name</Form.Label>
-                                        <Form.Control type="text"
-                                            placeholder="User Name"
-                                            defaultValue={this.username}
-                                            onChange={e => this.username = e.target.value}
-                                        />
-                                    </Form.Group>
-                                    <Form.Group controlId="signinForm.Password">
-                                        <Form.Label>Password</Form.Label>
-                                        <Form.Control type="password"
-                                            placeholder="Password"
-                                            defaultValue={this.password}
-                                            onChange={e => this.password = e.target.value} />
-                                    </Form.Group>
-                                    <Form.Group controlId="signinForm.ConfirmPassword">
-                                        <Form.Label>Confirm Password</Form.Label>
-                                        <Form.Control type="password"
-                                            placeholder="Confirm Password"
-                                            defaultValue={this.confirmPassword}
-                                            onChange={e => this.confirmPassword = e.target.value} />
-                                    </Form.Group>
-                                    <Row className="fullwidth">
-                                        <Col>
-                                            <Button variant="success"
-                                                type="submit">
-                                                {this.state.title}
-                                            </Button>
-                                        </Col>
-                                        <Col>
-                                            <Button variant="danger"
-                                                type="reset"
-                                                onClick={this.resetForm}>
-                                                Reset
-                                                </Button>
-                                        </Col>
-                                    </Row>
-                                </Form>
-                            </Row>
-                    }
-                    <Row className="justify-content-md-center fullwidth">
-                        <Button
-                            id="signupOrSignin"
-                            variant="primary"
-                            onClick={this.formSwitcher}>
-                            {this.state.signupOrSigninMsg}
-                        </Button>
+                        </Form>
                     </Row>
-
                 </Container>
             </div >
         );

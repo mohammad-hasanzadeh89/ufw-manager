@@ -13,6 +13,7 @@ class UsersList extends Component {
     isManager;
     queryId;
     queryUsername;
+
     constructor(props) {
         super(props);
 
@@ -21,13 +22,17 @@ class UsersList extends Component {
         this.isManager = props.isManager;
         this.queryId = undefined;
         this.queryUsername = undefined;
+
         this.state = {
             users: [],
             isLoading: false,
             isEditing: false,
+            isAddingNewUser: false,
             message: undefined,
             user: undefined,
             username: "",
+            password: "",
+            confirmPassword: "",
             activePage: 1,
             total: 0,
             pages: 0,
@@ -47,17 +52,16 @@ class UsersList extends Component {
         this.setState({ isEditing: false, user: undefined })
     }
 
-    grantAuthHandler = (_username) => {
+    grantAuthHandler = () => {
         this.setState({ isLoading: true })
         fetch(baseURL.url + 'grant_authorization', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${this.token
-                    }`,
+                'Authorization': `Bearer ${this.token}`,
                 'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username: _username })
+            body: JSON.stringify({ username: this.state.username })
         }).then(response => {
             if (response.ok) {
                 return response.json()
@@ -159,6 +163,56 @@ class UsersList extends Component {
                         isLoading: false
                     })
                 });
+    }
+
+    addUser = () => {
+        if (this.state.username.length >= 4 && this.state.password.length >= 8 && this.state.confirmPassword.length >= 8) {
+            if (this.state.password.normalize() === this.state.confirmPassword.normalize()) {
+                return fetch(baseURL.url + 'add_user', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.token}`,
+                        'Access-Control-Allow-Origin': '*',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: this.state.username, password: this.state.password })
+                }).then(response => response.json()).then(data => {
+                    if (data.message) {
+                        this.setState({
+                            message: data.message,
+                            isAddingNewUser: false,
+                            username: "",
+                            password: "",
+                            confirmPassword: ""
+                        }, () =>
+                            this.getUsers(this.state.activePage, this.state.perPage))
+                    } else {
+                        this.setState({ message: "something went wrong!" })
+                    }
+                });
+            } else {
+                return { message: `Password and confirm password is not equal!` }
+            }
+        } else {
+            this.setState({ message: `Please enter respective value for all fields` })
+        }
+    };
+
+    onHideAddNewUser = () => {
+        this.setState({
+            isAddingNewUser: false,
+            message: undefined
+        })
+    }
+
+    resetForm = () => {
+        document.getElementById('addUserForm').reset()
+        this.setState({
+            message: undefined,
+            username: "",
+            password: "",
+            confirmPassword: "",
+        });
     }
 
     componentDidMount() {
@@ -263,8 +317,7 @@ class UsersList extends Component {
                         pages={this.state.pages}
                         handlePageChange={this.handlePageChange} />
                 </Row>
-                <Modal
-                    show={this.state.isEditing}
+                <Modal show={this.state.isEditing}
                     onHide={this.reject}>
                     <Modal.Header closeButton>
                         <Modal.Title>Authorizate User</Modal.Title>
@@ -272,20 +325,87 @@ class UsersList extends Component {
                     <Modal.Body>
                         <p>
                             Are you sure, You want to grant manager
-                                privileges to {this.state.username} ?
-                                </p>
+                            privileges to {this.state.username} ?
+                        </p>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button
                             variant="success"
                             onClick={() =>
-                                this.grantAuthHandler(this.state.username)}>Yes</Button>
+                                this.grantAuthHandler()}>Yes</Button>
                         <Button
                             variant="danger"
                             onClick={this.reject}>NO</Button>
                     </Modal.Footer>
                 </Modal>
-            </Container>
+                <Modal show={this.state.isAddingNewUser}
+                    onHide={this.onHideAddNewUser}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Add New User</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {this.state.message !== undefined &&
+                            <Row className="justify-content-md-center">
+                                <h3>
+                                    <Badge
+                                        pill
+                                        variant="danger"
+                                    >*{this.state.message}</Badge>
+                                </h3>
+                            </Row>
+                        }
+                        <Form id="addUserForm" noValidate>
+                            <Form.Group controlId="addUserForm.Username">
+                                <Form.Label>User Name</Form.Label>
+                                <Form.Control type="text"
+                                    placeholder="Username"
+                                    value={this.state.username}
+                                    onChange={e => this.setState({ username: e.target.value })}
+                                />
+                                <Form.Text id="usernameHelpBlock" muted>the minimum username length  is 4 character</Form.Text>
+                            </Form.Group>
+                            <Form.Group controlId="addUserForm.Password">
+                                <Form.Label>Password</Form.Label>
+                                <Form.Control type="password"
+                                    placeholder="Password"
+                                    value={this.state.password}
+                                    onChange={e => this.setState({ password: e.target.value })} />
+                                <Form.Text id="passwordHelpBlock" muted>password must contin at least 8 character and must be used lower-case and upper-case letter and digit and symbols like Test123!</Form.Text>
+                            </Form.Group>
+                            <Form.Group controlId="addUserForm.ConfirmPassword">
+                                <Form.Label>Confirm Password</Form.Label>
+                                <Form.Control type="password"
+                                    placeholder="Confirm Password"
+                                    value={this.state.confirmPassword}
+                                    onChange={e => this.setState({ confirmPassword: e.target.value })} />
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button
+                            variant="success"
+                            onClick={this.addUser}>
+                            Add User
+                        </Button>
+                        <Button variant="danger"
+                            onClick={this.resetForm}>
+                            Reset
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                <Button
+                    style={{
+                        borderRadius: 50 + '%',
+                        fontWeight: 'bolder'
+                    }}
+                    onClick={() => this.setState({
+                        isAddingNewUser: true,
+                        message: undefined
+                    })}
+                >
+                    +
+                </Button>
+            </Container >
         );
     }
 
