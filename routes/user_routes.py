@@ -207,7 +207,7 @@ def signin():
     remote_ip = request.remote_addr
     if request.is_json:
         json_data = request.get_json()
-        username = sanitizer(json_data.get("username", ""))
+        username = sanitizer(json_data.get("username", "")).lower()
         password = sanitizer(json_data.get("password", ""))
 
         user = User.query.filter_by(username=username).first()

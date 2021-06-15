@@ -400,6 +400,7 @@ class UsersList extends Component {
                     }}
                     onClick={() => this.setState({
                         isAddingNewUser: true,
+                        username: "",
                         message: undefined
                     })}
                 >
