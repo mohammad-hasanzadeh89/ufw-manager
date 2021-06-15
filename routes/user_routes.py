@@ -161,9 +161,13 @@ def add_user():
     if test and test.admin_privileges:
         if request.is_json:
             json_data = request.get_json()
-            username = sanitizer(json_data.get("username", ""))
+            username = sanitizer(json_data.get("username", "")).lower()
             password = sanitizer(json_data.get("password", ""))
-
+            if len(username) < 4:
+                add_log(
+                    f"{remote_ip} as {test} tried to add new user with username: {username} and failed because of short username")
+                return jsonify(
+                    message="the username must be at least 4 char"), 400
             test_user = User.query.filter_by(username=username).first()
             if test_user:
                 add_log(
@@ -254,6 +258,7 @@ def change_password():
             test = User.query.filter_by(username=username).first()
             if test and test.verify_password(current_password):
                 test.set_password(new_password)
+                test.is_first = False
                 db.session.commit()
                 add_log(f"{remote_ip} as {test} change his/hers password")
                 return jsonify(message="Your password changed successfully."), 200
