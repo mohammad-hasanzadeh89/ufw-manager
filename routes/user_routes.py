@@ -111,44 +111,6 @@ def get_users():
     return jsonify(output), status_code
 
 
-@user_api_blueprint.route("/get_user_privileges", methods=["GET"])
-@jwt_required(fresh=True)
-@cross_origin()
-def get_user_privileges():
-    remote_ip = request.remote_addr
-    output = {}
-    status_code = 200
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log_msg = ""
-    log_tag = "INFO"
-    username = get_jwt_identity()
-    test = User.query.filter_by(username=username).first()
-    if test:
-        result = {
-            "isAdmin": test.admin_privileges,
-            "isManager": test.manager_privileges
-        }
-        output = {
-            "result": result,
-            "date": now
-        }
-
-        log_msg = f"{remote_ip} get {test} privileges records as {test}"
-    else:
-        log_msg = f"{remote_ip} tried to get {test} privileges records as {test} and failed because of Unauthorized user"
-        log_tag = "ALERT"
-
-        output = {
-            "result": "Unauthorized user",
-            "date": now
-        }
-        status_code = 403
-
-    add_log(log_msg, log_tag)
-
-    return jsonify(output), status_code
-
-
 @user_api_blueprint.route("/add_user", methods=["POST"])
 @jwt_required(fresh=True)
 @cross_origin()

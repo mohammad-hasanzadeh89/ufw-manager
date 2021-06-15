@@ -25,12 +25,12 @@
     }
   ],
   "paths": {
-    "/signup": {
+    "/add_user": {
       "post": {
         "tags": [
           "Auth"
         ],
-        "description": "Create new user",
+        "description": "admin can add new user",
         "requestBody": {
           "content": {
             "application/json": {
@@ -96,8 +96,33 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Unauthorized user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user_routes_response"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"message\":\"Unauthorized user\"}\n"
+                  },
+                  "1": {
+                    "value": "{\"message\":\"Unauthorized user\"}\n"
+                  }
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "token": [
+              "admin"
+            ]
+          }
+        ]
       }
     },
     "/signin": {
@@ -128,7 +153,7 @@
         },
         "responses": {
           "200": {
-            "description": "api token and sign in message",
+            "description": "api token, sign in message and user",
             "content": {
               "application/json": {
                 "schema": {
@@ -136,7 +161,7 @@
                 },
                 "examples": {
                   "0": {
-                    "value": "{\"access_token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTYxOTM0NDcyMywianRpIjoiOWZlOWNkZDktNjE2MS00NDRjLTllNzEtYTExYjMxYzhmODY4IiwibmJmIjoxNjE5MzQ0NzIzLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoidGVzdCIsImV4cCI6MTc0Mzc2MDcyM30.7OjacjsL5RsfcIx46tmk-Xymc9n75ny8co8Z-ZMPf7M\",\"message\":\"Login succeeded.\"}\n"
+                    "value": "{\"access_token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTYxOTM0NDcyMywianRpIjoiOWZlOWNkZDktNjE2MS00NDRjLTllNzEtYTExYjMxYzhmODY4IiwibmJmIjoxNjE5MzQ0NzIzLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoidGVzdCIsImV4cCI6MTc0Mzc2MDcyM30.7OjacjsL5RsfcIx46tmk-Xymc9n75ny8co8Z-ZMPf7M\",\"message\":\"Login succeeded.\" ,\"user\":{\"admin_privileges\": false, \"id\": 2, \"is_deleted\": false, \"is_first\": false, \"manager_privileges\": true, \"username\": \"test\"}}\n"
                   }
                 }
               }
@@ -303,55 +328,6 @@
           {
             "token": [
               "admin"
-            ]
-          }
-        ]
-      }
-    },
-    "/get_user_privileges": {
-      "get": {
-        "tags": [
-          "Users"
-        ],
-        "description": "To get user privileges",
-        "responses": {
-          "200": {
-            "description": "Response with user privileges",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/get_user_privileges_200"
-                },
-                "examples": {
-                  "0": {
-                    "value": "{\"result\": { \"isAdmin\": true,\"isManager\": true}, \"date\": \"2021-05-13 22:16:14\"}"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Unauthorized user",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/unauthorized_user_403"
-                },
-                "examples": {
-                  "0": {
-                    "value": "{\"result\": \"Unauthorized user\", \"date\": \"2021-05-13 22:16:14\"}"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "token": [
-              "admin",
-              "manager",
-              "user"
             ]
           }
         ]
@@ -2731,6 +2707,12 @@
           },
           "manager_privileges": {
             "type": "boolean"
+          },
+          "is_first": {
+            "type": "boolean"
+          },
+          "is_deleted": {
+            "type": "boolean"
           }
         }
       },
@@ -2949,6 +2931,9 @@
           },
           "message": {
             "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
           }
         }
       },
