@@ -219,7 +219,11 @@ def signin():
                         fresh=True, identity=username,
                         expires_delta=timedelta(minutes=30))
                     add_log(f"{remote_ip} {user} logged in")
-                    return jsonify(message="Login succeeded.", access_token=access_token)
+                    user = user_schema.dump(user)
+                    return jsonify(
+                        message="Login succeeded.",
+                        access_token=access_token,
+                        user=user)
                 else:
                     add_log(
                         f"{remote_ip} tried to login as {username} and failed because of user deleted by admin")

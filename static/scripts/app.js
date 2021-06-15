@@ -26,7 +26,8 @@ class App extends Component {
             token: this.getToken(),
             isLoading: false,
             isAdmin: this.getIsAdmin(),
-            isManager: this.getIsManager()
+            isManager: this.getIsManager(),
+            isFirst: this.getIsFirst()
         }
     }
 
@@ -78,14 +79,24 @@ class App extends Component {
         return isManager
     }
 
+    setIsFirst = (isFirst) => {
+        sessionStorage.setItem('isFirst', JSON.stringify(isFirst));
+        this.setState({ isFirst: isFirst })
+    }
 
+    getIsFirst = () => {
+        const isFirstString = sessionStorage.getItem('isFirst');
+        const isFirst = JSON.parse(isFirstString);
+        return isFirst
+    }
     render() {
         let token = this.state.token
         if (!this.state.token) {
             return <Auth
                 setToken={this.setToken}
                 setIsAdmin={this.setIsAdmin}
-                setIsManager={this.setIsManager} />
+                setIsManager={this.setIsManager}
+                setIsFirst={this.setIsFirst} />
         } else {
             token = this.state.token
         }
@@ -99,46 +110,46 @@ class App extends Component {
                         <Nav className="mr-auto">
                             <Nav.Link href="/#home">Home</Nav.Link>
                             {
-                                this.state.isManager &&
+                                (this.state.isManager && !this.state.isFirst) &&
                                 <Nav.Link href="#UFWManager">
                                     UFWManager
                                 </Nav.Link>
                             }
                             {
-                                this.state.isManager &&
+                                (this.state.isManager && !this.state.isFirst) &&
                                 <Nav.Link href="#rules">
                                     Rules
                                 </Nav.Link>
                             }
                             {
-                                this.state.isManager &&
+                                (this.state.isManager && !this.state.isFirst) &&
                                 <Nav.Link href="#routes">
                                     Routes
                                 </Nav.Link>
                             }
                             {
-                                this.state.isAdmin &&
+                                (this.state.isAdmin && !this.state.isFirst) &&
 
                                 <Nav.Link href="#deletedRules">
                                     Deleted Rules
                                 </Nav.Link>
                             }
                             {
-                                this.state.isAdmin &&
+                                (this.state.isAdmin && !this.state.isFirst) &&
 
                                 <Nav.Link href="#deletedRoutes">
                                     Deleted Routes
                                 </Nav.Link>
                             }
                             {
-                                this.state.isAdmin &&
+                                (this.state.isAdmin && !this.state.isFirst) &&
 
                                 <Nav.Link href="#statusChangeRecords">
                                     Status Change Records
                                 </Nav.Link>
                             }
                             {
-                                this.state.isAdmin &&
+                                (this.state.isAdmin && !this.state.isFirst) &&
 
                                 <Nav.Link href="#users">
                                     Users
@@ -146,11 +157,11 @@ class App extends Component {
                             }
                             <Nav.Link href="#changePassword">
                                 Change Password
-                                </Nav.Link>
+                            </Nav.Link>
                         </Nav>
                         <Button variant="danger" onClick={this.Signout}>
                             sign out
-                                </Button>
+                        </Button>
                     </Navbar.Collapse>
                 </Navbar>
 

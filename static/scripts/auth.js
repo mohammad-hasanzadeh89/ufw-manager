@@ -33,13 +33,16 @@ class Auth extends Component {
     setToken;
     setIsAdmin;
     setIsManager;
+    setIsFirst;
     username;
     password;
     constructor(props) {
         super(props);
-        this.setToken = props.setToken
-        this.setIsAdmin = props.setIsAdmin
-        this.setIsManager = props.setIsManager
+        this.setToken = props.setToken;
+        this.setIsAdmin = props.setIsAdmin;
+        this.setIsManager = props.setIsManager;
+        this.setIsFirst = props.setIsFirst;
+
         this.state = {
             token: null,
             isLoading: false,
@@ -54,17 +57,6 @@ class Auth extends Component {
         this.password = "";
     }
 
-
-    handleGetgUserPrivileges = async (token) => {
-        const data = await getgUserPrivileges(token)
-        if (data.result.isAdmin !== undefined && data.result.isManager !== undefined) {
-            this.setIsAdmin(data.result.isAdmin);
-            this.setIsManager(data.result.isManager);
-        } else {
-            this.setState({ message: data.result })
-        }
-    }
-
     handleSigninSubmit = async e => {
         e.preventDefault();
         const data = await signinUser(
@@ -72,8 +64,10 @@ class Auth extends Component {
             this.password
         )
         if (data.access_token) {
-            await this.handleGetgUserPrivileges(data.access_token)
             this.setToken(data.access_token);
+            this.setIsAdmin(data.user.admin_privileges);
+            this.setIsManager(data.user.manager_privileges);
+            this.setIsFirst(data.user.is_first);
         } else {
             this.setState({ message: data.message })
         }

@@ -70,6 +70,11 @@ class ChangePassword extends Component {
                         confirmNewPassword: "",
                         isLoading: false
                     })
+                }).then(() => {
+                    setTimeout(() => {
+                        sessionStorage.clear()
+                        window.location.replace("/")
+                    }, 3000);
                 });
     }
     handleChangePassword = async e => {
@@ -164,14 +169,14 @@ class ChangePassword extends Component {
                                     type="submit"
                                     onClick={this.handleChangePassword}>
                                     submit
-                                    </Button>
+                                </Button>
                             </Col>
                             <Col>
                                 <Button variant="danger"
                                     type="reset"
                                     onClick={this.resetForm}>
                                     Reset
-                                    </Button>
+                                </Button>
                             </Col>
                         </Row>
                     </Form>
