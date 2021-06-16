@@ -102,32 +102,6 @@ class UFWManager extends Component {
                 reports: this.state.reports
             });
         }
-        // fetch(baseURL.url + action, {
-        //     method: 'GET',
-        //     headers: {
-        //         'Authorization': `Bearer ${this.token
-        //             }`,
-        //         'Access-Control-Allow-Origin': '*',
-        //         'Content-Type': 'application/json'
-        //     }
-        // }).then(
-        //     response => response.json()).catch(err => { console.log(err) }).then(
-        //         data => {
-        //             let status = false
-        //             if (!data.result.includes("disabled") ||
-        //                 !data.result.includes("not enabled")) {
-        //                 if (action === "enable" ||
-        //                     action === "realod") {
-        //                     status = true
-        //                 }
-        //             }
-        //             this.state.reports.unshift(data)
-        //             this.setState({
-        //                 isLoading: false,
-        //                 isEnable: status,
-        //                 reports: this.state.reports
-        //             })
-        //         });
     }
 
     getStatus = async () => {

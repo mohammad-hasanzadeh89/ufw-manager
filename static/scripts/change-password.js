@@ -35,7 +35,7 @@ class ChangePassword extends Component {
     }
 
     changePassword = async e => {
-        fetch(baseURL.url + 'change_password', {
+        const response = await fetch(baseURL.url + 'change_password', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${this.token
@@ -43,39 +43,52 @@ class ChangePassword extends Component {
                 'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ current_password: this.state.currentPassword, new_password: this.state.newPassword, confirm_new_password: this.state.confirmNewPassword })
-        }).then(
-            response => {
-                if (response.status === 401) {
+            body: JSON.stringify({
+                current_password: this.state.currentPassword,
+                new_password: this.state.newPassword,
+                confirm_new_password: this.state.confirmNewPassword
+            })
+        })
+        if (!response.ok) {
+            if (response.status === 401) {
+                sessionStorage.clear()
+                window.location.replace("/")
+            }
+            else if (response.status === 403) {
+                this.strike++;
+                console.log(this.strike)
+                if (this.strike >= 3) {
                     sessionStorage.clear()
                     window.location.replace("/")
                 }
-                // TODO add this to app level
-                if (response.status === 403) {
-                    this.strike++;
-                    console.log(this.strike)
-                    if (this.strike >= 3) {
-                        sessionStorage.clear()
-                        window.location.replace("/")
-                    }
-                }
-                return response.json()
-            }).then(
-                data => {
+            }
+            else if (response.status === 429) {
+                this.setState({
+                    message: "429, Too Many Requests.",
+                    currentPassword: "",
+                    newPassword: "",
+                    confirmNewPassword: "",
+                    isLoading: false
+                })
+            }
+        }
+        if (response.status !== 429) {
+            const data = await response.json()
+            this.setState({
+                message: data.message,
+                currentPassword: "",
+                newPassword: "",
+                confirmNewPassword: "",
+                isLoading: false
+            })
 
-                    this.setState({
-                        message: data.message,
-                        currentPassword: "",
-                        newPassword: "",
-                        confirmNewPassword: "",
-                        isLoading: false
-                    })
-                }).then(() => {
-                    setTimeout(() => {
-                        sessionStorage.clear()
-                        window.location.replace("/")
-                    }, 3000);
-                });
+            if (response.status === 200) {
+                setTimeout(() => {
+                    sessionStorage.clear()
+                    window.location.replace("/")
+                }, 3000);
+            }
+        }
     }
     handleChangePassword = async e => {
         e.preventDefault();

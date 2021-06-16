@@ -7,7 +7,7 @@ from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identi
 from sqlalchemy import or_
 
 from models.user import User, user_schema, users_schema
-from utilities.db_manager import db
+from utilities.db_manager import db, limiter
 from utilities.sanitizer import sanitizer
 from utilities.logger import add_log
 
@@ -164,6 +164,7 @@ def add_user():
 
 @user_api_blueprint.route("/signin", methods=["POST"])
 @cross_origin()
+@limiter.limit("3/minute;12/hour;100/day")
 def signin():
 
     remote_ip = request.remote_addr
@@ -205,6 +206,7 @@ def signin():
 @user_api_blueprint.route("/change_password", methods=["POST"])
 @jwt_required(fresh=True)
 @cross_origin()
+@limiter.limit("3/minute;12/hour;100/day")
 def change_password():
     remote_ip = request.remote_addr
 

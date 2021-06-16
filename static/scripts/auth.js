@@ -2,32 +2,7 @@ import React, { Component } from 'react';
 import { Container, Row, Col, Form, Button, Table, Badge } from 'react-bootstrap';
 import baseURL from './baseURL.json';
 
-const signinUser = async (_username, _password) => {
-    if (_username && _password) {
-        return fetch(baseURL.url + 'signin', {
-            method: 'POST',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username: _username, password: _password })
-        }).then(data => data.json());
-    } else {
-        return { message: "Please enter username and password" }
-    }
 
-};
-
-const getgUserPrivileges = async (token) => {
-    return fetch(baseURL.url + 'get_user_privileges', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json'
-        }
-    }).then(data => data.json());
-};
 
 class Auth extends Component {
     setToken;
@@ -57,19 +32,46 @@ class Auth extends Component {
         this.password = "";
     }
 
-    handleSigninSubmit = async e => {
+    signin = async e => {
         e.preventDefault();
-        const data = await signinUser(
-            this.username,
-            this.password
-        )
-        if (data.access_token) {
-            this.setToken(data.access_token);
-            this.setIsAdmin(data.user.admin_privileges);
-            this.setIsManager(data.user.manager_privileges);
-            this.setIsFirst(data.user.is_first);
+        if (this.username && this.password) {
+            const response = await fetch(baseURL.url + 'signin', {
+                method: 'POST',
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: this.username,
+                    password: this.password
+                })
+            })
+            let data = null
+            if (!response.ok) {
+                if (response.status === 429) {
+                    this.setState({
+                        message: "429, Too Many Requests."
+                    })
+                } else {
+                    data = await response.json()
+                    this.setState({
+                        message: data.message
+                    })
+                }
+            }
+            else {
+                data = await response.json()
+                if (data.access_token) {
+                    this.setToken(data.access_token);
+                    this.setIsAdmin(data.user.admin_privileges);
+                    this.setIsManager(data.user.manager_privileges);
+                    this.setIsFirst(data.user.is_first);
+                }
+            }
         } else {
-            this.setState({ message: data.message })
+            this.setState({
+                message: "Please enter username and password"
+            })
         }
     };
 
@@ -93,7 +95,7 @@ class Auth extends Component {
                     }
                     <Row className="justify-content-md-center">
                         <Form
-                            onSubmit={this.handleSigninSubmit}>
+                            onSubmit={this.signin}>
                             <Form.Group controlId="signinForm.Username">
                                 <Form.Label>User Name</Form.Label>
                                 <Form.Control type="text"

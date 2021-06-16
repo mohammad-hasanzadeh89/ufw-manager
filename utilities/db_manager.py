@@ -3,12 +3,15 @@ from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from flask_bcrypt import Bcrypt
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 db = SQLAlchemy()
 ma = Marshmallow()
 bcrypt = Bcrypt()
 admin_username = ""
 admin_password = ""
+limiter = Limiter(key_func=get_remote_address)
 
 
 def db_init_app(app):
@@ -69,3 +72,18 @@ def bcrypt_init_app(app):
     bcrypt.app = app
     bcrypt.init_app(app)
     return bcrypt
+
+
+def limiter_init_app(app):
+    """
+    The function to initialize Flask Object for Limiter object.
+
+    Parameters:
+        app (Flask): the Flask Object that Limiter object needs.
+
+    Returns:
+        limiter: Limiter object that Rate Limiting Rules.      
+    """
+    limiter.app = app
+    limiter.init_app(app)
+    return limiter
