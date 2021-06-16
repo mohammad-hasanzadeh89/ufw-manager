@@ -118,13 +118,13 @@ def add_user():
     remote_ip = request.remote_addr
     output = []
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    json_data = request.get_json()
+    username = sanitizer(json_data.get("username", "")).lower()
+    password = sanitizer(json_data.get("password", ""))
     admin = get_jwt_identity()
     test = User.query.filter_by(username=admin).first()
     if test and test.admin_privileges:
         if request.is_json:
-            json_data = request.get_json()
-            username = sanitizer(json_data.get("username", "")).lower()
-            password = sanitizer(json_data.get("password", ""))
             if len(username) < 4:
                 add_log(
                     f"{remote_ip} as {test} tried to add new user with username: {username} and failed because of short username")
