@@ -27,8 +27,8 @@ app.config["JWT_SECRET_KEY"] = secrets.token_urlsafe(48)
 # app.config["JWT_SECRET_KEY"] = "<YOURSECERTKEY-unsafe>"
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-db = db_init_app(app)
-db_create_tables(app, db)
+db_init_app(app)
+db_create_tables(app)
 ma_init_app(app)
 bcrypt_init_app(app)
 limiter_init_app(app)

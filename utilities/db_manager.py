@@ -29,7 +29,7 @@ def db_init_app(app):
     return db
 
 
-def db_create_tables(app, db):
+def db_create_tables(app):
     """
     The function to create table in database.
 
@@ -40,7 +40,8 @@ def db_create_tables(app, db):
         MockConnection: MockConnection object that connects to database.       
     """
     engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
-    db.metadata.create_all(engine)
+    db.create_all()
+    db.session.commit()
     return engine
 
 
