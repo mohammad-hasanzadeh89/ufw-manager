@@ -154,9 +154,9 @@ class ChangePassword extends Component {
                 }
                 <Row className="justify-content-md-center">
                     <Form id="changePasswordForm">
-                        <Form.Group controlId="changePasswordForm.Username">
+                        <Form.Group controlId="changePasswordForm.CurrentPassword">
                             <Form.Label>Current Password</Form.Label>
-                            <Form.Control type="text"
+                            <Form.Control type="password"
                                 placeholder="Current Password"
                                 defaultValue={this.username}
                                 onChange={e => this.state.currentPassword = e.target.value}

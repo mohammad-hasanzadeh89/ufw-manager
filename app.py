@@ -31,6 +31,7 @@ db_init_app(app)
 db_create_tables(app)
 ma_init_app(app)
 bcrypt_init_app(app)
+limiter_init_app(app)
 jwt = JWTManager(app)
 
 app.register_blueprint(ufw_manager_blueprint, url_prefix="/api")
@@ -78,4 +79,4 @@ def expire_token(header, payload):
 
 
 if __name__ == "__main__":
-    print("*****Use this instead*****\nsudo venv/bin/gunicorn -b=127.0.0.1:5000 app:app")
+    print("*****Use this instead*****\nsudo venv/bin/gunicorn -b=0.0.0.0:8080 app:app")
