@@ -16,9 +16,9 @@ npm run build
 example:
 from:
 {
-    "url": "http://localhost:5000/api/"
+    "url": "http://0.0.0.0:8080/api/"
 }
 to:
 {
-    "url": "http://localhost:{PORT}/api/"
+    "url": "http://0.0.0.0:{PORT}/api/"
 }
