@@ -25,9 +25,9 @@ def db_init_app(app):
         SQLAlchemy: SQLAlchemy object that interacts with database.       
     """
     db.app = app
-    db.init_app(app)
     engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
     db.metadata.create_all(engine)
+    db.init_app(app)
     return db
 
 
