@@ -1,5 +1,6 @@
 #!/bin/bash
 clear
+service ufw-mng stop
 rm -rf /opt/ufw-manager
 rm -f /etc/systemd/system/ufw-mng.service
 echo -e '\nUFW-Manager Installer (Please run the script as root)\n\n'
