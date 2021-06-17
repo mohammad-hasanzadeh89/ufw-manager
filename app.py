@@ -27,9 +27,7 @@ app.config["JWT_SECRET_KEY"] = secrets.token_urlsafe(48)
 # app.config["JWT_SECRET_KEY"] = "<YOURSECERTKEY-unsafe>"
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-db = db_init_app(app)
-engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
-db.metadata.create_all(engine)
+db_init_app(app)
 ma_init_app(app)
 bcrypt_init_app(app)
 limiter_init_app(app)

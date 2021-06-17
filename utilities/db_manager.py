@@ -26,22 +26,24 @@ def db_init_app(app):
     """
     db.app = app
     db.init_app(app)
+    engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+    db.metadata.create_all(engine)
     return db
 
 
-def db_create_tables(app):
-    """
-    The function to create table in database.
+# def db_create_tables(app):
+#     """
+#     The function to create table in database.
 
-    Parameters:
-        app (Flask): The Flask Object that SQLAlchemy object needs.
+#     Parameters:
+#         app (Flask): The Flask Object that SQLAlchemy object needs.
 
-    Returns:
-        MockConnection: MockConnection object that connects to database.       
-    """
-    engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
-    db.metadata.create_all(engine)
-    return engine
+#     Returns:
+#         MockConnection: MockConnection object that connects to database.
+#     """
+#     engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+#     db.metadata.create_all(engine)
+#     return engine
 
 
 def ma_init_app(app):
