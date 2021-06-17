@@ -10,57 +10,26 @@ Flask REST-API and React UI for managing UFW service
 
 ## Installation
 
-1.Create a virtual environment
+1.download installtion file from <a download="install.sh" href="https://raw.githubusercontent.com/mohammad-hasanzadeh89/ufw-manager/master/install.sh" title="install">HERE</a> (right click on it and click on "Save Link As...")
+
+![Image of Save Link As](https://raw.githubusercontent.com/mohammad-hasanzadeh89/ufw-manager/master/static/img/Save%20Link%20As....png)
+
+2.run the script as root
 
 ```
-$ python3 -m venv venv
+$ chmod +x install.sh
+$ sudo bash install.sh 
 ```
 
-2.Activate the virtual environment
-
-```
-$ source venv/bin/activate
-```
-
-3.Install python requirements
-
-```
-$ pip3 install -r requirements.txt 
-``` 
-
-4.Navigate to the static folder with cd command
-
-```
-$ cd static
-```
-
-5.Install react requirements
-
-```
-/static$ npm install
-``` 
-
-6.Build react project
-
-```
-/static$ npm run build
-```
-
-7.Navigate back to main diractory and run gunicorn server with root privilages and port you want
-
-```
-/static$ cd ..
-$ sudo venv/bin/gunicorn -b=127.0.0.1:<PORT> app:app
-```
 now enjoy it.
 
 If you like this you can support me with a star and share it
 
 ## Addresses
 
-API documentation is accessible at this address when you run the local server at: http://localhost:{PORT}/docs/
+API documentation is accessible at this address when you run the local server at: http://0.0.0.0:8080/docs/
 
-React UI is accessible at this address when you run the local server at: http://localhost:{PORT}/
+React UI is accessible at this address when you run the local server at: http://0.0.0.0:8080/
 
 ## License
 
