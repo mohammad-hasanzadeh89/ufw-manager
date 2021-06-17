@@ -29,7 +29,7 @@ def db_init_app(app):
     return db
 
 
-def db_create_tables(app):
+def db_create_tables(app, db):
     """
     The function to create table in database.
 

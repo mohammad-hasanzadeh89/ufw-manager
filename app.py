@@ -27,8 +27,8 @@ app.config["JWT_SECRET_KEY"] = secrets.token_urlsafe(48)
 # app.config["JWT_SECRET_KEY"] = "<YOURSECERTKEY-unsafe>"
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-# db_init_app(app)
-# db_create_tables(app)
+db = db_init_app(app)
+db_create_tables(app, db)
 ma_init_app(app)
 bcrypt_init_app(app)
 limiter_init_app(app)
@@ -50,8 +50,6 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 @app.before_first_request
 def before_first_request():
-    db_init_app(app)
-    db_create_tables(app)
     create_admin()
     update_service_table()
 
