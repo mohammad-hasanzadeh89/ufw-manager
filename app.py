@@ -50,6 +50,7 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 @app.before_first_request
 def before_first_request():
+    db_create_tables(app)
     create_admin()
     update_service_table()
 
