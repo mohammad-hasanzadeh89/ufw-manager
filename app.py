@@ -7,7 +7,7 @@ from flask_jwt_extended import JWTManager
 from flask_swagger_ui import get_swaggerui_blueprint
 
 from routes.ufw_manager_routes import ufw_manager_blueprint, update_service_table
-from routes.user_routes import user_api_blueprint, create_admin
+from routes.user_routes import user_api_blueprint
 from utilities.db_manager import *
 
 app = Flask(__name__)
@@ -50,7 +50,6 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 @app.before_first_request
 def before_first_request():
-    create_admin()
     update_service_table()
 
 
@@ -71,6 +70,11 @@ def swagger_api_docs_yml():
 @cross_origin()
 def route_not_found(error):
     return jsonify('This route does not exist'), 404
+
+
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return jsonify(message="Too Many Requests."), 429
 
 
 @jwt.expired_token_loader

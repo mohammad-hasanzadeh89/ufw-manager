@@ -62,32 +62,22 @@ class ChangePassword extends Component {
                     window.location.replace("/")
                 }
             }
-            else if (response.status === 429) {
-                this.setState({
-                    message: "429, Too Many Requests.",
-                    currentPassword: "",
-                    newPassword: "",
-                    confirmNewPassword: "",
-                    isLoading: false
-                })
-            }
         }
-        if (response.status !== 429) {
-            const data = await response.json()
-            this.setState({
-                message: data.message,
-                currentPassword: "",
-                newPassword: "",
-                confirmNewPassword: "",
-                isLoading: false
-            })
 
-            if (response.status === 200) {
-                setTimeout(() => {
-                    sessionStorage.clear()
-                    window.location.replace("/")
-                }, 3000);
-            }
+        const data = await response.json()
+        this.setState({
+            message: data.message,
+            currentPassword: "",
+            newPassword: "",
+            confirmNewPassword: "",
+            isLoading: false
+        })
+
+        if (response.status === 200) {
+            setTimeout(() => {
+                sessionStorage.clear()
+                window.location.replace("/")
+            }, 3000);
         }
     }
     handleChangePassword = async e => {

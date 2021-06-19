@@ -287,17 +287,6 @@ def grant_authorization():
         return jsonify("Bad Request.\nyou need to send parameters as json object"), 400
 
 
-def create_admin():
-    admin = User.query.filter_by(username="admin").first()
-    if not admin:
-        new_user = User(username="admin", password="admin",
-                        admin_privileges=True,
-                        manager_privileges=True)
-        add_log(f"admin created")
-        db.session.add(new_user)
-        db.session.commit()
-
-
 def check_pass_is_strong(pwd):
     if pwd == None or len(pwd) < 8:
         return False

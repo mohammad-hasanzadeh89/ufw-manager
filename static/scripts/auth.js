@@ -48,16 +48,10 @@ class Auth extends Component {
             })
             let data = null
             if (!response.ok) {
-                if (response.status === 429) {
-                    this.setState({
-                        message: "429, Too Many Requests."
-                    })
-                } else {
-                    data = await response.json()
-                    this.setState({
-                        message: data.message
-                    })
-                }
+                data = await response.json()
+                this.setState({
+                    message: data.message
+                })
             }
             else {
                 data = await response.json()
