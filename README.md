@@ -5,6 +5,7 @@ Flask REST-API and React UI for managing UFW service
 ## Table of Contents
 
 - [Installation](#installation)
+- [Management](#management)
 - [Addresses](#addresses)
 - [License](#license)
 
@@ -22,6 +23,39 @@ $ sudo bash install.sh
 ```
 
 now enjoy it.
+
+## Management
+You can manage ufw-mng service with these command:
+
+* start ufw-mng:
+
+```
+$ service ufw-mng start
+```
+
+* stop ufw-mng:
+
+```
+$ service ufw-mng stop
+```
+
+* restart ufw-mng:
+
+```
+$ service ufw-mng restart
+```
+
+* enable ufw-mng:
+
+```
+$ service ufw-mng enable
+```
+
+* see status of ufw-mng:
+
+```
+$ service ufw-mng status
+```
 
 If you like this you can support me with a star and share it
 
