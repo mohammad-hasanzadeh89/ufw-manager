@@ -27,6 +27,19 @@ now enjoy it.
 ## Management
 You can manage ufw-mng service with these command:
 
+* Add New Admin User to ufw-mng:
+
+```
+$ cd /opt/ufw-manager/ && source venv/bin/activate && sudo python3 manage.py --create_admin
+```
+or
+
+```
+$ cd /opt/ufw-manager/ 
+/opt/ufw-manager$ source venv/bin/activate
+(vnev) /opt/ufw-manager$ sudo python3 manage.py --create_admin
+```
+
 * start ufw-mng:
 
 ```
