@@ -6,7 +6,8 @@ class UserListItem extends Component {
         super(props);
         this.state = {
             user: props.user,
-            grantAuthOpener: props.grantAuthOpener
+            grantAuthOpener: props.grantAuthOpener,
+            deleteUserOpener: props.deleteUserOpener
         }
     }
     render() {
@@ -16,8 +17,11 @@ class UserListItem extends Component {
                 <td>{user.id.toString()}</td>
                 <td>{user.username}</td>
                 <td>{user.manager_privileges.toString()}</td>
-                <td>{!user.manager_privileges &&
+                <td>{user.is_deleted.toString()}</td>
+                <td>{(!user.manager_privileges &&
+                    !user.is_deleted) &&
                     <Button
+                        style={{ marginRight: '1rem' }}
                         variant="warning"
                         onClick={
                             () => { this.state.grantAuthOpener(user) }}
@@ -25,7 +29,17 @@ class UserListItem extends Component {
                         aria-expanded={this.props.isEditing}>
                         Grant Manager Authorization
                     </Button>
-                }</td>
+                }
+                    {!user.is_deleted &&
+                        <Button
+                            variant="danger"
+                            onClick={
+                                () => { this.state.deleteUserOpener(user) }}
+                            aria-controls="confirm-box"
+                            aria-expanded={this.props.isEditing}>
+                            Delete User
+                        </Button>
+                    }</td>
             </tr>
         );
     }

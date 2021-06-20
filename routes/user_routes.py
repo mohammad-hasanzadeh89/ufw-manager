@@ -203,6 +203,41 @@ def signin():
         return jsonify("Bad Request.\nyou need to send parameters as json object"), 400
 
 
+@user_api_blueprint.route("/delete_user", methods=["PUT"])
+@jwt_required(fresh=True)
+@cross_origin()
+def delete_user():
+    remote_ip = request.remote_addr
+    json_data = request.get_json()
+    username = sanitizer(json_data.get("username", "")).lower()
+    admin = get_jwt_identity()
+    test = User.query.filter_by(username=admin).first()
+    if test and test.admin_privileges:
+        if request.is_json:
+            test_user = User.query.filter_by(username=username).first()
+            if test_user:
+                test_user.is_deleted = True
+                db.session.add(test_user)
+                db.session.commit()
+                add_log(
+                    f"{remote_ip} as {test} delete user with username: {username} successfully")
+
+                return jsonify(
+                    message=f"user with username: {username} deleted."), 200
+            else:
+                add_log(
+                    f"{remote_ip} as {test} tried to delete user with username: {username} and failed because the user dose not exists")
+                return jsonify(
+                    message=f"user '{username}' dose not exists."), 404
+
+        else:
+            return jsonify("Bad Request.\nyou need to send parameters as json object"), 400
+    else:
+        add_log(
+            f"{remote_ip} try to delete user with username: {username} as {test}")
+        return jsonify(message="Unauthorized user"), 403
+
+
 @user_api_blueprint.route("/change_password", methods=["POST"])
 @jwt_required(fresh=True)
 @cross_origin()

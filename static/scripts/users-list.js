@@ -27,6 +27,7 @@ class UsersList extends Component {
             users: [],
             isLoading: false,
             isEditing: false,
+            isDeleting: false,
             isAddingNewUser: false,
             message: undefined,
             user: undefined,
@@ -48,8 +49,20 @@ class UsersList extends Component {
         })
     }
 
+    deleteUserOpener = (user) => {
+        this.setState({
+            isDeleting: true,
+            user: user,
+            username: user.username
+        })
+    }
+
     reject = () => {
-        this.setState({ isEditing: false, user: undefined })
+        this.setState({
+            isEditing: false,
+            isDeleting: false,
+            user: undefined
+        })
     }
 
     grantAuthHandler = () => {
@@ -89,6 +102,50 @@ class UsersList extends Component {
             data => {
                 this.setState({
                     isEditing: false,
+                    isLoading: false,
+                    user: undefined,
+                    message: data.message
+                })
+                this.componentDidMount()
+            });
+    }
+
+    deleteUserHandler = () => {
+        this.setState({ isLoading: true })
+        fetch(baseURL.url + 'delete_user', {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${this.token}`,
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username: this.state.username })
+        }).then(response => {
+            if (response.ok) {
+                return response.json()
+            } else {
+                if (response.status === 401) {
+                    sessionStorage.clear()
+                    window.location.replace("/")
+                }
+                let alertMsg = response.status.toString()
+                alertMsg += " " + response.statusText
+                this.setState({
+                    isLoading: false,
+                    users: [],
+                    user: undefined,
+                    message: alertMsg,
+                    username: "",
+                    activePage: 1,
+                    total: 0,
+                    pages: 0,
+                })
+                return undefined
+            }
+        }).then(
+            data => {
+                this.setState({
+                    isDeleting: false,
                     isLoading: false,
                     user: undefined,
                     message: data.message
@@ -299,7 +356,8 @@ class UsersList extends Component {
                                 <th>Id</th>
                                 <th>User Name</th>
                                 <th>Manager Privileges</th>
-                                <th>Authorize</th>
+                                <th>Is Deleted</th>
+                                <th>Manage</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -308,6 +366,7 @@ class UsersList extends Component {
                                     key={user.id}
                                     user={user}
                                     grantAuthOpener={this.grantAuthOpener}
+                                    deleteUserOpener={this.deleteUserOpener}
                                     isEditing={this.isEditing} />
                             )}
                         </tbody>
@@ -338,6 +397,29 @@ class UsersList extends Component {
                             onClick={this.reject}>NO</Button>
                     </Modal.Footer>
                 </Modal>
+                <Modal show={this.state.isDeleting}
+                    onHide={this.reject}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Delete User</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>
+                            Are you sure, You want to
+                            delete user with this
+                            username '{this.state.username}' ?
+                        </p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button
+                            variant="success"
+                            onClick={() =>
+                                this.deleteUserHandler()}>Yes</Button>
+                        <Button
+                            variant="danger"
+                            onClick={this.reject}>NO</Button>
+                    </Modal.Footer>
+                </Modal>
+
                 <Modal show={this.state.isAddingNewUser}
                     onHide={this.onHideAddNewUser}>
                     <Modal.Header closeButton>
