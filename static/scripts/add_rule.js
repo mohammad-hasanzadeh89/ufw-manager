@@ -75,8 +75,12 @@ class AddRule extends Component {
                     sessionStorage.clear()
                     window.location.replace("/")
                 }
+                else if (response.status === 422) {
+                    sessionStorage.clear()
+                    window.location.replace("/")
+                }
                 // TODO add this to app level
-                if (response.status === 403) {
+                else if (response.status === 403) {
                     this.strike++;
                     console.log(this.strike)
                     if (this.strike >= 3) {
@@ -85,6 +89,15 @@ class AddRule extends Component {
                     }
                 }
                 return response.json()
+            }).catch(error => {
+                console.log(error)
+                this.setState({
+                    message: error.toString(),
+                })
+                return {
+                    result: [],
+                    date: new Date().toGMTString()
+                }
             }).then(
                 data => {
                     this._isMounted && this.setState({
@@ -92,6 +105,7 @@ class AddRule extends Component {
                     })
                 });
     }
+    
     addRule = () => {
         if (this._isMounted) {
             let body = {
@@ -135,8 +149,12 @@ class AddRule extends Component {
                         sessionStorage.clear()
                         window.location.replace("/")
                     }
+                    else if (response.status === 422) {
+                        sessionStorage.clear()
+                        window.location.replace("/")
+                    }
                     // TODO add this to app level
-                    if (response.status === 403) {
+                    else if (response.status === 403) {
                         this.strike++;
                         console.log(this.strike)
                         if (this.strike >= 3) {
@@ -145,6 +163,12 @@ class AddRule extends Component {
                         }
                     }
                     return response.json()
+                }).catch(error => {
+                    console.log(error)
+                    return {
+                        result: error.toString(),
+                        date: new Date().toGMTString()
+                    }
                 }).then(
                     data => {
                         this._isMounted && this.setState({

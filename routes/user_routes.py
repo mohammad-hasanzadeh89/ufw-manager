@@ -17,7 +17,6 @@ user_api_blueprint = Blueprint(
 
 @user_api_blueprint.route("/get_all_user", methods=["GET"])
 @jwt_required(fresh=True)
-@cross_origin()
 def get_all_user():
     remote_ip = request.remote_addr
     output = {}
@@ -62,7 +61,6 @@ def get_all_user():
 
 @user_api_blueprint.route("/get_users", methods=["GET"])
 @jwt_required(fresh=True)
-@cross_origin()
 def get_users():
     remote_ip = request.remote_addr
     output = {}
@@ -113,7 +111,6 @@ def get_users():
 
 @user_api_blueprint.route("/add_user", methods=["POST"])
 @jwt_required(fresh=True)
-@cross_origin()
 def add_user():
     remote_ip = request.remote_addr
     output = []
@@ -163,7 +160,6 @@ def add_user():
 
 
 @user_api_blueprint.route("/signin", methods=["POST"])
-@cross_origin()
 @limiter.limit("3/minute;12/hour;100/day")
 def signin():
 
@@ -205,7 +201,6 @@ def signin():
 
 @user_api_blueprint.route("/delete_user", methods=["PUT"])
 @jwt_required(fresh=True)
-@cross_origin()
 def delete_user():
     remote_ip = request.remote_addr
     json_data = request.get_json()
@@ -279,7 +274,6 @@ def change_password():
 
 @ user_api_blueprint.route("/grant_authorization", methods=["POST"])
 @ jwt_required(fresh=True)
-@cross_origin()
 def grant_authorization():
     remote_ip = request.remote_addr
     if request.is_json:

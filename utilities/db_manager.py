@@ -11,7 +11,9 @@ ma = Marshmallow()
 bcrypt = Bcrypt()
 admin_username = ""
 admin_password = ""
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["60 per minute"])
 
 
 def db_init_app(app):

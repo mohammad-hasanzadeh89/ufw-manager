@@ -76,11 +76,33 @@ class UFWManager extends Component {
                 'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json'
             }
-        })
-        const data = await response.json()
-        if (response.ok) {
+        }).then(response => {
+            if (response.status === 401) {
+                sessionStorage.clear()
+                window.location.replace("/")
+            }
+            else if (response.status === 422) {
+                sessionStorage.clear()
+                window.location.replace("/")
+            }
+            else if (response.status === 403) {
+                this.strike++;
+                console.log(this.strike)
+                if (this.strike >= 3) {
+                    sessionStorage.clear()
+                    window.location.replace("/")
+                }
+            }
+            return response.json()
+        }).catch(error => {
+            console.log(error)
+            return {
+                result: error.toString(),
+                date: new Date().toGMTString()
+            }
+        }).then(data => {
             let status = false
-            if (!data.result.includes("disabled") ||
+            if (data !== undefined && !data.result.includes("disabled") ||
                 !data.result.includes("not enabled")) {
                 if (action === "enable" ||
                     action === "realod") {
@@ -93,15 +115,8 @@ class UFWManager extends Component {
                 isEnable: status,
                 reports: this.state.reports
             });
-        } else {
-            console.log(response)
-            this.state.reports.unshift(data)
-            this.setState({
-                isLoading: false,
-                isEnable: false,
-                reports: this.state.reports
-            });
-        }
+
+        })
     }
 
     getStatus = async () => {
@@ -113,21 +128,44 @@ class UFWManager extends Component {
                 'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json'
             }
+        }).then(response => {
+            if (response.status === 401) {
+                sessionStorage.clear()
+                window.location.replace("/")
+            }
+            else if (response.status === 422) {
+                sessionStorage.clear()
+                window.location.replace("/")
+            }
+            else if (response.status === 403) {
+                this.strike++;
+                console.log(this.strike)
+                if (this.strike >= 3) {
+                    sessionStorage.clear()
+                    window.location.replace("/")
+                }
+            }
+            return response.json()
+        }).catch(error => {
+            console.log(error)
+            return {
+                result: [error.toString()],
+                date: new Date().toGMTString()
+            }
         }).then(
-            response => response.json()).then(
-                data => {
-                    if (data.result[0].startsWith("Status: active")) {
-                        this.setState({
-                            isEnable: true,
-                            status: data
-                        })
-                    } else {
-                        this.setState({
-                            isEnable: false,
-                            status: data
-                        })
-                    }
-                });
+            data => {
+                if (data.result[0].startsWith("Status: active")) {
+                    this.setState({
+                        isEnable: true,
+                        status: data
+                    })
+                } else {
+                    this.setState({
+                        isEnable: false,
+                        status: data
+                    })
+                }
+            });
     }
 
     componentDidMount = () => {

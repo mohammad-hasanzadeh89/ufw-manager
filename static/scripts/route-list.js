@@ -80,7 +80,40 @@ class RouteList extends Component {
             },
             body: JSON.stringify({ routeId: routeId })
         }).then(
-            response => response.json()).then(
+            response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else {
+                    if (response.status === 401) {
+                        sessionStorage.clear()
+                        window.location.replace("/")
+                    }
+                    else if (response.status === 422) {
+                        sessionStorage.clear()
+                        window.location.replace("/")
+                    }
+                    else if (response.status === 403) {
+                        this.strike++;
+                        console.log(this.strike)
+                        if (this.strike >= 3) {
+                            sessionStorage.clear()
+                            window.location.replace("/")
+                        }
+                    }
+                }
+            }).catch(error => {
+                console.log(error)
+                let alertMsg = error.toString()
+
+                this.setState({
+                    isLoading: false,
+                    message: alertMsg,
+                    activePage: 1,
+                    total: 0,
+                    pages: 0
+                })
+            }).then(
                 data => {
                     this.state.reports.unshift(data)
                     this.setState({
@@ -177,6 +210,18 @@ class RouteList extends Component {
                         sessionStorage.clear()
                         window.location.replace("/")
                     }
+                    else if (response.status === 422) {
+                        sessionStorage.clear()
+                        window.location.replace("/")
+                    }
+                    else if (response.status === 403) {
+                        this.strike++;
+                        console.log(this.strike)
+                        if (this.strike >= 3) {
+                            sessionStorage.clear()
+                            window.location.replace("/")
+                        }
+                    }
                     console.log(response)
                     let alertMsg = response.status.toString()
                     alertMsg += " " + response.statusText
@@ -191,6 +236,18 @@ class RouteList extends Component {
                     })
                     return undefined
                 }
+            }).catch(error => {
+                console.log(error)
+                let alertMsg = error.toString()
+
+                this.setState({
+                    message: alertMsg,
+                    isLoading: false,
+                    activePage: 1,
+                    total: 0,
+                    pages: 0,
+                    routes: [],
+                })
             }).then(
                 data => {
                     if (data) {

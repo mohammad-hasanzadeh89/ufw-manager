@@ -1,5 +1,6 @@
 
 import os.path as path
+from datetime import datetime
 import secrets
 from flask import Flask, jsonify, render_template
 from flask_cors import CORS, cross_origin
@@ -67,14 +68,16 @@ def swagger_api_docs_yml():
 
 
 @ app.errorhandler(404)
-@cross_origin()
 def route_not_found(error):
     return jsonify('This route does not exist'), 404
 
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
-    return jsonify(message="Too Many Requests."), 429
+    return jsonify(message="Too Many Requests.",
+                   result="Too Many Requests.",
+                   date=datetime.now().strftime(
+                       "%Y-%m-%d %H:%M:%S")), 429
 
 
 @jwt.expired_token_loader

@@ -104,7 +104,7 @@ class App extends Component {
             <div className="App wrapper">
                 <Navbar collapseOnSelect expand="lg"
                     bg="dark" variant="dark">
-                    <Navbar.Brand href="#home">Navbar</Navbar.Brand>
+                    <Navbar.Brand href="#home">UFW Manager</Navbar.Brand>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="mr-auto">

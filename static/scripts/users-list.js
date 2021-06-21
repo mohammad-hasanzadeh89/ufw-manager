@@ -83,6 +83,18 @@ class UsersList extends Component {
                     sessionStorage.clear()
                     window.location.replace("/")
                 }
+                else if (response.status === 422) {
+                    sessionStorage.clear()
+                    window.location.replace("/")
+                }
+                else if (response.status === 403) {
+                    this.strike++;
+                    console.log(this.strike)
+                    if (this.strike >= 3) {
+                        sessionStorage.clear()
+                        window.location.replace("/")
+                    }
+                }
                 console.log(response)
                 let alertMsg = response.status.toString()
                 alertMsg += " " + response.statusText
@@ -98,6 +110,19 @@ class UsersList extends Component {
                 })
                 return undefined
             }
+        }).catch(error => {
+            let alertMsg = error.toString()
+
+            this.setState({
+                isLoading: false,
+                users: [],
+                user: undefined,
+                message: alertMsg,
+                username: "",
+                activePage: 1,
+                total: 0,
+                pages: 0,
+            })
         }).then(
             data => {
                 this.setState({
@@ -128,6 +153,18 @@ class UsersList extends Component {
                     sessionStorage.clear()
                     window.location.replace("/")
                 }
+                else if (response.status === 422) {
+                    sessionStorage.clear()
+                    window.location.replace("/")
+                }
+                else if (response.status === 403) {
+                    this.strike++;
+                    console.log(this.strike)
+                    if (this.strike >= 3) {
+                        sessionStorage.clear()
+                        window.location.replace("/")
+                    }
+                }
                 let alertMsg = response.status.toString()
                 alertMsg += " " + response.statusText
                 this.setState({
@@ -142,8 +179,23 @@ class UsersList extends Component {
                 })
                 return undefined
             }
+        }).catch(error => {
+            let alertMsg = error.toString()
+
+            this.setState({
+                isLoading: false,
+                users: [],
+                user: undefined,
+                message: alertMsg,
+                username: "",
+                activePage: 1,
+                total: 0,
+                pages: 0,
+            })
+            return undefined
         }).then(
             data => {
+                if(typeof(data) !== 'undefined') {
                 this.setState({
                     isDeleting: false,
                     isLoading: false,
@@ -151,6 +203,7 @@ class UsersList extends Component {
                     message: data.message
                 })
                 this.componentDidMount()
+            }
             });
     }
 
@@ -193,6 +246,18 @@ class UsersList extends Component {
                         sessionStorage.clear()
                         window.location.replace("/")
                     }
+                    else if (response.status === 422) {
+                        sessionStorage.clear()
+                        window.location.replace("/")
+                    }
+                    else if (response.status === 403) {
+                        this.strike++;
+                        console.log(this.strike)
+                        if (this.strike >= 3) {
+                            sessionStorage.clear()
+                            window.location.replace("/")
+                        }
+                    }
                     console.log(response)
                     let alertMsg = response.status.toString()
                     alertMsg += " " + response.statusText
@@ -208,17 +273,32 @@ class UsersList extends Component {
                     })
                     return undefined
                 }
+            }).catch(error => {
+                let alertMsg = error.toString()
+
+                this.setState({
+                    isLoading: false,
+                    users: [],
+                    user: undefined,
+                    message: alertMsg,
+                    username: "",
+                    activePage: 1,
+                    total: 0,
+                    pages: 0,
+                })
             }).then(
                 data => {
-                    this.setState({
-                        message: undefined,
-                        users: data.result,
-                        activePage: activePage,
-                        total: data.total,
-                        pages: Math.ceil(data.total / this.state.perPage),
-                        perPage: perPage,
-                        isLoading: false
-                    })
+                    if(typeof(data) !== 'undefined') {
+                        this.setState({
+                            message: undefined,
+                            users: data.result,
+                            activePage: activePage,
+                            total: data.total,
+                            pages: Math.ceil(data.total / this.state.perPage),
+                            perPage: perPage,
+                            isLoading: false
+                        })
+                    }  
                 });
     }
 
@@ -233,8 +313,46 @@ class UsersList extends Component {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ username: this.state.username, password: this.state.password })
-                }).then(response => response.json()).then(data => {
-                    if (data.message) {
+                }).then(
+                    response => {
+                        if (response.ok) {
+                            return response.json()
+                        }
+                        else {
+                            if (response.status === 401) {
+                                sessionStorage.clear()
+                                window.location.replace("/")
+                            }
+                            else if (response.status === 422) {
+                                sessionStorage.clear()
+                                window.location.replace("/")
+                            }
+                            else if (response.status === 403) {
+                                this.strike++;
+                                console.log(this.strike)
+                                if (this.strike >= 3) {
+                                    sessionStorage.clear()
+                                    window.location.replace("/")
+                                }
+                            }
+                        }
+                    }).catch(error => {
+                    let alertMsg = error.toString()
+
+                    this.setState({
+                        isLoading: false,
+                        users: [],
+                        user: undefined,
+                        message: alertMsg,
+                        username: "",
+                        activePage: 1,
+                        total: 0,
+                        pages: 0,
+                    })
+                    return undefined
+                }).then(data => {
+                    if (typeof(data) !== 'undefined' &&
+                         data.message) {
                         this.setState({
                             message: data.message,
                             isAddingNewUser: false,

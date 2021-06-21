@@ -27,7 +27,6 @@ rule_protocols = ["tcp/udp", "tcp", "udp", "ah",
 
 @ufw_manager_blueprint.route("/get_services", methods=["GET"])
 @jwt_required(fresh=True)
-@cross_origin()
 def get_services():
     remote_ip = request.remote_addr
     output = {}
@@ -143,7 +142,6 @@ def get_status_change_records_by_time():
 
 @ufw_manager_blueprint.route("/get_status_change_records_by_user_id", methods=["GET"])
 @jwt_required(fresh=True)
-@cross_origin()
 def get_status_change_records_by_user_id():
     remote_ip = request.remote_addr
     output = {}
@@ -223,7 +221,6 @@ def get_status_change_records_by_user_id():
 
 @ufw_manager_blueprint.route("/get_all_rules", methods=["GET"])
 @jwt_required(fresh=True)
-@cross_origin()
 def get_all_rules():
     remote_ip = request.remote_addr
     output = {}
@@ -276,7 +273,6 @@ def get_all_rules():
 
 @ufw_manager_blueprint.route("/get_rules_by_user_id", methods=["GET"])
 @jwt_required(fresh=True)
-@cross_origin()
 def get_rules_by_user_id():
     remote_ip = request.remote_addr
     output = {}
@@ -349,7 +345,6 @@ def get_rules_by_user_id():
 
 @ufw_manager_blueprint.route("/get_rules_by_type", methods=["GET"])
 @jwt_required(fresh=True)
-@cross_origin()
 def get_rules_by_type():
     remote_ip = request.remote_addr
     output = {}
@@ -611,7 +606,6 @@ def get_deleted_rules_by_type():
 
 @ufw_manager_blueprint.route("/get_all_routes", methods=["GET"])
 @jwt_required(fresh=True)
-@cross_origin()
 def get_all_routes():
     remote_ip = request.remote_addr
     output = {}
@@ -664,7 +658,6 @@ def get_all_routes():
 
 @ufw_manager_blueprint.route("/get_routes_by_user_id", methods=["GET"])
 @jwt_required(fresh=True)
-@cross_origin()
 def get_routes_by_user_id():
     remote_ip = request.remote_addr
     output = {}
@@ -738,7 +731,6 @@ def get_routes_by_user_id():
 
 @ufw_manager_blueprint.route("/get_routes_by_type", methods=["GET"])
 @jwt_required(fresh=True)
-@cross_origin()
 def get_routes_by_type():
     remote_ip = request.remote_addr
     output = {}

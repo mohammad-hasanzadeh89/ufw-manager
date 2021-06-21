@@ -134,6 +134,18 @@ class DeletedRuleList extends Component {
                         sessionStorage.clear()
                         window.location.replace("/")
                     }
+                    else if (response.status === 422) {
+                        sessionStorage.clear()
+                        window.location.replace("/")
+                    }
+                    else if (response.status === 403) {
+                        this.strike++;
+                        console.log(this.strike)
+                        if (this.strike >= 3) {
+                            sessionStorage.clear()
+                            window.location.replace("/")
+                        }
+                    }
                     let alertMsg = response.status.toString()
                     alertMsg += " " + response.statusText
 
@@ -148,6 +160,19 @@ class DeletedRuleList extends Component {
                     })
                     return undefined
                 }
+            }).catch(error => {
+                console.log(error)
+                let alertMsg = error.toString()
+
+                this.setState({
+                    isLoading: false,
+                    rules: [],
+                    rule: undefined,
+                    message: alertMsg,
+                    activePage: 1,
+                    total: 0,
+                    pages: 0
+                })
             }).then(
                 data => {
                     if (data) {

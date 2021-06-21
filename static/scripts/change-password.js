@@ -54,6 +54,10 @@ class ChangePassword extends Component {
                 sessionStorage.clear()
                 window.location.replace("/")
             }
+            else if (response.status === 422) {
+                sessionStorage.clear()
+                window.location.replace("/")
+            }
             else if (response.status === 403) {
                 this.strike++;
                 console.log(this.strike)
