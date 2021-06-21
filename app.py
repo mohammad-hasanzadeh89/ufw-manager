@@ -74,8 +74,9 @@ def route_not_found(error):
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
-    return jsonify(message="Too Many Requests.",
-                   result="Too Many Requests.",
+    msg = str(e).replace("429 ", "")
+    return jsonify(message=msg,
+                   result=msg,
                    date=datetime.now().strftime(
                        "%Y-%m-%d %H:%M:%S")), 429
 
