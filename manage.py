@@ -7,7 +7,7 @@ import bcrypt
 
 from utilities.sanitizer import sanitizer
 from utilities.logger import add_log
-from select_menu import Menu
+from utilities.select_menu import Menu
 
 
 def create_admin():
