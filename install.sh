@@ -39,4 +39,4 @@ systemctl daemon-reload
 systemctl enable ufw-mng
 systemctl start ufw-mng
 clear
-echo "cd /opt/ufw-manager/ && source venv/bin/activate && sudo python3 manage.py"
+cd /opt/ufw-manager/ && source venv/bin/activate && sudo python3 manage.py
