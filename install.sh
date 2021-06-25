@@ -5,7 +5,7 @@ rm -rf /opt/ufw-manager
 rm -f /etc/systemd/system/ufw-mng.service
 echo -e '\nUFW-Manager Installer (Please run the script as root)\n\n'
 echo -e 'Install Packages\n'
-apt install python3-pip git nodejs npm -y
+apt install python3-pip python3-venv git nodejs npm -y
 cd /opt/
 git clone https://github.com/mohammad-hasanzadeh89/ufw-manager
 cd ufw-manager
