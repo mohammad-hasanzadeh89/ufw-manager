@@ -16,6 +16,10 @@ cd static
 npm install
 npm run build 
 cd ..
+touch /opt/ufw-manager/config.json
+echo '{
+    "rate_limiting_string": "60/minute"
+}' >> /opt/ufw-manager/config.json
 touch /etc/systemd/system/ufw-mng.service
 chmod +x /etc/systemd/system/ufw-mng.service
 echo "cd /opt/ufw-manager && /opt/ufw-manager/venv/bin/gunicorn -b=0.0.0.0:8080 app:app" > /opt/ufw-manager/start.sh
@@ -34,3 +38,5 @@ WantedBy=multi-user.target" >> /etc/systemd/system/ufw-mng.service
 systemctl daemon-reload
 systemctl enable ufw-mng
 systemctl start ufw-mng
+clear
+echo "cd /opt/ufw-manager/ && source venv/bin/activate && sudo python3 manage.py"

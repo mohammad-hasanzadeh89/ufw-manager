@@ -1,4 +1,3 @@
-
 import os.path as path
 from datetime import datetime
 import secrets
@@ -21,11 +20,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + \
     path.join(resource_dir, "data_base.db")
 app.config["JWT_TOKEN_LOCATION"] = ["headers", "json"]
 app.config["JWT_COOKIE_SECURE"] = False
-app.config["JWT_SECRET_KEY"] = secrets.token_urlsafe(48)
-# WARNING: the static secret key is vulnerable in brute-force or dictionary-attack,
-# but if you want to use a static secret key,
-# uncomment the line after this and comment the line before this
-# app.config["JWT_SECRET_KEY"] = "<YOURSECERTKEY-unsafe>"
+is_static_secret_key = config_data.get("is_static_secret_key")
+static_secret_key = config_data.get("static_secret_key")
+if (is_static_secret_key is not None and is_static_secret_key
+    ) and (static_secret_key is not None):
+    app.config["JWT_SECRET_KEY"] = static_secret_key
+else:
+    app.config["JWT_SECRET_KEY"] = secrets.token_urlsafe(48)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 db_init_app(app)

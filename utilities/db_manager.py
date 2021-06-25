@@ -1,4 +1,5 @@
 import json
+from os import path
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
@@ -6,14 +7,20 @@ from flask_bcrypt import Bcrypt
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+config_data = {}
+if path.exists("config.json"):
+    with open("config.json") as file:
+        config_data = json.load(file)
 db = SQLAlchemy()
 ma = Marshmallow()
 bcrypt = Bcrypt()
 admin_username = ""
 admin_password = ""
+
+limiter_string = config_data.get("rate_limiting_string", "60 per minute")
 limiter = Limiter(
     key_func=get_remote_address,
-    default_limits=["60 per minute"])
+    default_limits=[limiter_string])
 
 
 def db_init_app(app):
