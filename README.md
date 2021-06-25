@@ -11,7 +11,7 @@ Flask REST-API and React UI for managing UFW service
 
 ## Installation
 
-1.download installtion file from <a download="install.sh" href="https://github.com/mohammad-hasanzadeh89/ufw-manager/raw/master/install.zip" title="install">HERE</a> (right click on it and click on "Save Link As...")
+1.download installtion file from <a download="install.sh" href="https://github.com/mohammad-hasanzadeh89/ufw-manager/raw/master/install.zip" title="install">HERE</a>
 
 2.run the script as root
 
