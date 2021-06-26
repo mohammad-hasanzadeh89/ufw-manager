@@ -31,13 +31,6 @@ You can manage ufw-mng service with these command:
 ```
 cd /opt/ufw-manager/ && source venv/bin/activate && sudo python3 manage.py
 ```
-or
-
-```
-cd /opt/ufw-manager/ 
-/opt/ufw-manager$ source venv/bin/activate
-(vnev) /opt/ufw-manager$ sudo python3 manage.py
-```
 
 * start ufw-mng:
 
