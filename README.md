@@ -18,7 +18,7 @@ Flask REST-API and React UI for managing UFW service
 3.run the install.sh script as root
 
 ```
-$ sudo bash install.sh 
+sudo bash install.sh 
 ```
 
 now enjoy it.
@@ -29,53 +29,46 @@ You can manage ufw-mng service with these command:
 * managing config file of ufw-mng:
 
 ```
-$ cd /opt/ufw-manager/ && source venv/bin/activate && sudo python3 manage.py
-```
-or
-
-```
-$ cd /opt/ufw-manager/ 
-/opt/ufw-manager$ source venv/bin/activate
-(vnev) /opt/ufw-manager$ sudo python3 manage.py
+cd /opt/ufw-manager/ && source venv/bin/activate && sudo python3 manage.py
 ```
 
 * start ufw-mng:
 
 ```
-$ service ufw-mng start
+service ufw-mng start
 ```
 
 * stop ufw-mng:
 
 ```
-$ service ufw-mng stop
+service ufw-mng stop
 ```
 
 * restart ufw-mng:
 
 ```
-$ service ufw-mng restart
+service ufw-mng restart
 ```
 
 * enable ufw-mng:
 
 ```
-$ service ufw-mng enable
+service ufw-mng enable
 ```
 
 * see status of ufw-mng:
 
 ```
-$ service ufw-mng status
+service ufw-mng status
 ```
 
 If you like this you can support me with a star and share it
 
 ## Addresses
 
-API documentation is accessible at this address when you run the local server at: http://<YOUR-SERVER-IP-Address>:8080/docs/
+API documentation is accessible at this address when you run the local server at: http://[YOUR-SERVER-IP-Address]:8080/docs/
 
-React UI is accessible at this address when you run the local server at: http://<YOUR-SERVER-IP-Address>:8080/
+React UI is accessible at this address when you run the local server at: http://[YOUR-SERVER-IP-Address]:8080/
 
 ## License
 

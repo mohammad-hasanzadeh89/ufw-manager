@@ -1,11 +1,11 @@
 Install react requirements
 
 ```
-/static$ npm install
+npm install
 ``` 
 
 Build react project
 
 ```
-/static$ npm run build
+npm run build
 ```
