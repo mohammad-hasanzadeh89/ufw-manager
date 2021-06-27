@@ -18,7 +18,9 @@ npm run build
 cd ..
 touch /opt/ufw-manager/config.json
 echo '{
-    "rate_limiting_string": "60/minute"
+    "rate_limiting_string": "60/minute",
+    "is_static_secret_key": false,
+    "static_secret_key": "YOURSECERTKEY-UNSAFE"
 }' >> /opt/ufw-manager/config.json
 touch /etc/systemd/system/ufw-mng.service
 chmod +x /etc/systemd/system/ufw-mng.service
