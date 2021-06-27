@@ -66,9 +66,9 @@ If you like this you can support me with a star and share it
 
 ## Addresses
 
-API documentation is accessible at this address when you run the local server at: http://<YOUR-SERVER-IP-Address>:8080/docs/
+API documentation is accessible at this address when you run the local server at: http://[YOUR-SERVER-IP-Address]:8080/docs/
 
-React UI is accessible at this address when you run the local server at: http://<YOUR-SERVER-IP-Address>:8080/
+React UI is accessible at this address when you run the local server at: http://[YOUR-SERVER-IP-Address]:8080/
 
 ## License
 
